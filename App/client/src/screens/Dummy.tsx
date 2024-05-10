@@ -1,20 +1,11 @@
 import React from "react";
-import { SafeAreaView, Button, Text, View, StyleSheet, Image, Pressable } from "react-native";
-import { useNavigation } from '@react-navigation/native';
+import { SafeAreaView, Button, Text, View, StyleSheet } from "react-native";
+import MorseNav from '../navigation/MorseNav.tsx';
+import { BlurView } from 'expo-blur';
 
 const Dummy = () => {
-  const navigation = useNavigation();
-
-  const handlePress = () => {
-    navigation.navigate('Dummy2', { selectedItem: 'A' });
-  };
-
-  return (
-    <SafeAreaView>
-      <Pressable onPress={handlePress}>
-        <Text>pussy</Text>
-      </Pressable>
-    </SafeAreaView>
+  return(
+    <MorseNav />  
   );
 }
 
