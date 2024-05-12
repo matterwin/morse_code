@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { TouchableOpacity, SafeAreaView, Button, Text, View, StyleSheet, Image, Pressable, FlatList, TextInput } from "react-native";
 import { useNavigation } from '@react-navigation/native';
 import { COLORS } from '../constants';
@@ -24,6 +24,10 @@ const Dummy1 = () => {
   const handleSearch = () => {
     handlePress(userInput);
   };
+
+  useEffect(() => {
+    console.log(userInput);
+  },[userInput])
 
   return (
     <View style={styles.container}>

@@ -3,24 +3,30 @@ import { SafeAreaView, Button, Text, View, StyleSheet, Image, TextInput, Touchab
 import { COLORS } from '../constants';
 import Icon from 'react-native-vector-icons/Ionicons';
 import SearchModal from '../components/modals/SearchModal.tsx';
+import MorseCode from '../components/dots/MorseCode.tsx';
+import Dot from '../components/dots/Dot.tsx';
+import { morseCodeMap } from '../components/dots/MorseCodeMap.tsx';
 
 const Dummy2 = ({ route }) => {
-  const { selectedItem } = route.params || 'A'; 
+  const selectedItem  = route.params?.selectedItem || 'A'; 
   const [letterPhrase, setLetterPhrase] = useState(selectedItem);
   const [modalVisible, setModalVisible] = useState(false);
+  const [volume, setVolume] = useState(true);
 
   const [isPressed, setIsPressed] = useState(false);
   const [isPressedIn, setIsPressedIn] = useState(false);
+  const [codeSequence, setCodeSequence] = useState('');
+  const [codeSequenceIndex, setCodeSequenceIndex] = useState(0);
+  const [letterPhraseIndex, setLetterPhraseIndex] = useState(0);
 
   useEffect(() => {
-    if(selectedItem === undefined) {
-      setLetterPhrase('A');
-    } else {
-    setLetterPhrase(selectedItem);
-    }
+    setLetterPhrase(route.params?.selectedItem || 'A')
+    setLetterPhraseIndex(0);
+    setCodeSequenceIndex(0);
   },[selectedItem]);
 
   const handlePress = () => {
+    setCodeSequenceIndex(prev => prev+1);
     setIsPressed(true);
     setIsPressedIn(false);
     setTimeout(() => {
@@ -28,23 +34,57 @@ const Dummy2 = ({ route }) => {
     }, 30);
   };
 
+  useEffect(() => {
+    console.log(codeSequence);
+  },[codeSequence])
+
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.topView}>
-        <Text style={{ fontSize: 32, }}>{letterPhrase}</Text>
+        <Text>{morseCodeMap[letterPhrase[letterPhraseIndex]]}</Text>
+        <Text style={styles.phraseText}>{letterPhrase[letterPhraseIndex]}</Text>
+        <MorseCode 
+          phrase={letterPhrase} 
+          codeSequence={codeSequence} 
+          setCodeSequence={setCodeSequence}
+          codeSequenceIndex={codeSequenceIndex}
+          setLetterPhraseIndex={setLetterPhraseIndex}
+        /> 
       </View>
       <View style={styles.middleView}>
-        <Pressable style={{ paddingVertical: 25, }} onPress={() => setModalVisible(true)}>
+        <Pressable style={{ paddingVertical: 20 }} onPress={() => setModalVisible(true)}>
          <Icon 
-            name={'caret-forward'} 
-            size={25} 
+            name={'repeat'} 
+            size={35} 
             color={'#ccc'} 
           />
         </Pressable>
-        <Pressable style={{ paddingVertical: 25 }} onPress={() => setModalVisible(true)}>
+        <Pressable style={{ paddingVertical: 20 }} onPress={() => setVolume(!volume)}>
+          <Icon 
+            name={volume ? 'volume-high' : 'volume-mute'} 
+            size={35} 
+            color={'#ccc'} 
+          />
+        </Pressable>
+                <Pressable style={{ paddingVertical: 19 }} onPress={() => setModalVisible(true)}>
          <Icon 
             name={'search'} 
-            size={25} 
+            size={34} 
+            color={'#ccc'} 
+          />
+        </Pressable>
+        <Pressable style={{ paddingVertical: 20 }} onPress={() => setModalVisible(true)}>
+         <Icon 
+            name={'arrow-undo'} 
+            size={35} 
+            color={'#ccc'} 
+          />
+        </Pressable>
+
+        <Pressable style={{ paddingVertical: 20 }} onPress={() => setModalVisible(true)}>
+         <Icon 
+            name={'arrow-redo'} 
+            size={35} 
             color={'#ccc'} 
           />
         </Pressable>
@@ -102,6 +142,11 @@ const styles = StyleSheet.create({
   pressed: {
     borderColor: '#ccc',
     // backgroundColor: 'rgba(255, 255, 255, 0.95)',
+  },
+  phraseText: {
+    fontSize: 80,
+    fontWeight: '600',
+    color: COLORS.grey
   },
 });
 
