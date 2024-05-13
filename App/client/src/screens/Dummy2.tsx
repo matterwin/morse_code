@@ -10,19 +10,24 @@ import { morseCodeMap } from '../components/dots/MorseCodeMap.tsx';
 const Dummy2 = ({ route }) => {
   const selectedItem  = route.params?.selectedItem || 'A'; 
   const [letterPhrase, setLetterPhrase] = useState(selectedItem);
+  const [codeSequence, setCodeSequence] = useState('');
+  const [codeSequenceIndex, setCodeSequenceIndex] = useState(0);
+  const [letterPhraseIndex, setLetterPhraseIndex] = useState(0);
+
   const [modalVisible, setModalVisible] = useState(false);
   const [volume, setVolume] = useState(true);
 
   const [isPressed, setIsPressed] = useState(false);
   const [isPressedIn, setIsPressedIn] = useState(false);
-  const [codeSequence, setCodeSequence] = useState('');
-  const [codeSequenceIndex, setCodeSequenceIndex] = useState(0);
-  const [letterPhraseIndex, setLetterPhraseIndex] = useState(0);
+  const [wordSpace, setWordSpace] = useState(false);
+  const [letterSpace, setLetterSpace] = useState(false);
+  const [bgColor, setBgColor] = useState('#ffd35c');
 
   useEffect(() => {
     setLetterPhrase(route.params?.selectedItem || 'A')
     setLetterPhraseIndex(0);
     setCodeSequenceIndex(0);
+    setBgColor('#ffd35c');
   },[selectedItem]);
 
   const handlePress = () => {
@@ -40,16 +45,36 @@ const Dummy2 = ({ route }) => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <View style={styles.topView}>
-        <Text>{morseCodeMap[letterPhrase[letterPhraseIndex]]}</Text>
-        <Text style={styles.phraseText}>{letterPhrase[letterPhraseIndex]}</Text>
-        <MorseCode 
-          phrase={letterPhrase} 
-          codeSequence={codeSequence} 
+      <View style={[styles.topView, { backgroundColor: bgColor }]}>
+        {wordSpace && !letterSpace &&
+          <>
+            <Text>{morseCodeMap[letterPhrase[letterPhraseIndex]]}</Text>
+            <Text style={styles.phraseText}>/</Text>
+          </>
+        }
+        {!wordSpace && letterSpace && 
+          <>
+            <Text>{morseCodeMap[letterPhrase[letterPhraseIndex]]}</Text>
+            <Text style={styles.phraseText}>_</Text>
+          </>
+        }
+        {!wordSpace && !letterSpace &&
+          <>
+            <Text>{morseCodeMap[letterPhrase[letterPhraseIndex]]}</Text>
+            <Text style={styles.phraseText}>{letterPhrase[letterPhraseIndex]}</Text>
+          </>
+        }
+        <MorseCode
+          phrase={letterPhrase}
+          codeSequence={codeSequence}
           setCodeSequence={setCodeSequence}
           codeSequenceIndex={codeSequenceIndex}
+          setCodeSequenceIndex={setCodeSequenceIndex}
           setLetterPhraseIndex={setLetterPhraseIndex}
-        /> 
+          setWordSpace={setWordSpace}
+          setLetterSpace={setLetterSpace}
+          setBgColor={setBgColor}
+        />
       </View>
       <View style={styles.middleView}>
         <Pressable style={{ paddingVertical: 20 }} onPress={() => setModalVisible(true)}>
