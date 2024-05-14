@@ -25,10 +25,6 @@ const Dummy1 = () => {
     handlePress(userInput);
   };
 
-  useEffect(() => {
-    console.log(userInput);
-  },[userInput])
-
   return (
     <View style={styles.container}>
       <BlurView intensity={10} style={styles.overlay}>

@@ -7,6 +7,21 @@ import MorseCode from '../components/dots/MorseCode.tsx';
 import Dot from '../components/dots/Dot.tsx';
 import { morseCodeMap } from '../components/dots/MorseCodeMap.tsx';
 
+const letterMorse = (text) => {
+  if(text) {
+    if(isAlphabetical(text) === true) {
+      const c = text.toUpperCase();
+      return morseCodeMap[c];
+    } else { 
+      return null;
+    }
+  }
+};
+
+function isAlphabetical(char) {
+  return /[a-zA-Z]/.test(char);
+}
+
 const Dummy2 = ({ route }) => {
   const selectedItem  = route.params?.selectedItem || 'A'; 
   const [letterPhrase, setLetterPhrase] = useState(selectedItem);
@@ -23,15 +38,20 @@ const Dummy2 = ({ route }) => {
   const [letterSpace, setLetterSpace] = useState(false);
   const [bgColor, setBgColor] = useState('#ffd35c');
 
+  const [pressed, setPressed] = useState(false);
+  const [padding, setPadding] = useState(10);
+
   useEffect(() => {
+    console.log(selectedItem);
     setLetterPhrase(route.params?.selectedItem || 'A')
     setLetterPhraseIndex(0);
     setCodeSequenceIndex(0);
     setBgColor('#ffd35c');
+    setPadding(10);
   },[selectedItem]);
 
   const handlePress = () => {
-    setCodeSequenceIndex(prev => prev+1);
+    // setCodeSequenceIndex(prev => prev+1);
     setIsPressed(true);
     setIsPressedIn(false);
     setTimeout(() => {
@@ -39,28 +59,27 @@ const Dummy2 = ({ route }) => {
     }, 30);
   };
 
-  useEffect(() => {
-    console.log(codeSequence);
-  },[codeSequence])
+  // useEffect(() => {
+  //   console.log(morseCodeMap[letterPhrase[letterPhraseIndex]]);
+  //   console.log(codeSequence);
+  // },[codeSequence])
 
   return (
     <SafeAreaView style={styles.container}>
       <View style={[styles.topView, { backgroundColor: bgColor }]}>
         {wordSpace && !letterSpace &&
           <>
-            <Text>{morseCodeMap[letterPhrase[letterPhraseIndex]]}</Text>
             <Text style={styles.phraseText}>/</Text>
           </>
         }
         {!wordSpace && letterSpace && 
           <>
-            <Text>{morseCodeMap[letterPhrase[letterPhraseIndex]]}</Text>
             <Text style={styles.phraseText}>_</Text>
           </>
         }
         {!wordSpace && !letterSpace &&
           <>
-            <Text>{morseCodeMap[letterPhrase[letterPhraseIndex]]}</Text>
+            <Text>{letterMorse(letterPhrase[letterPhraseIndex])}</Text>
             <Text style={styles.phraseText}>{letterPhrase[letterPhraseIndex]}</Text>
           </>
         }
@@ -74,6 +93,9 @@ const Dummy2 = ({ route }) => {
           setWordSpace={setWordSpace}
           setLetterSpace={setLetterSpace}
           setBgColor={setBgColor}
+          pressed={pressed}
+          padding={padding}
+          setPadding={setPadding}
         />
       </View>
       <View style={styles.middleView}>
@@ -122,11 +144,13 @@ const Dummy2 = ({ route }) => {
           isPressedIn && { backgroundColor: 'rgba(255, 255, 255, 0.35)' }
         ]}
         onPress={handlePress}
-        onPressIn={() => setIsPressedIn(true)}
-        onPressOut={() => setIsPressedIn(false)}
+        onPressIn={() => {setIsPressedIn(true); setPressed(true); console.log("in")}}
+        onPressOut={() => {setIsPressedIn(false); setPressed(false); console.log("out")}}
       >
         <View>
+          <Pressable onPress={() => setPadding(10)}>
           <Text style={{ color: '#ccc' }}>Tap here</Text>
+          </Pressable>
         </View>
       </Pressable>
     </SafeAreaView>

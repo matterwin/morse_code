@@ -1,20 +1,45 @@
-import React from "react";
-import { SafeAreaView, Button, Text, View, StyleSheet } from "react-native";
+import React, { useState, useEffect } from "react";
+import { Pressable, View, StyleSheet } from "react-native";
 import { COLORS } from '../../constants';
 
-const Dash = () => {
-  return(
-    <View style={styles.dashView}>
-    </View>
+const Dash = ({ pressed, padding, setPadding }) => {
+
+  useEffect(() => {
+    console.log(pressed);
+    if (pressed) {
+      const interval = setInterval(() => {
+        setPadding(prevPadding => prevPadding + 1);
+      }, 10);
+
+      return () => clearInterval(interval);
+    }
+  }, [pressed]);
+
+  return (
+    <Pressable
+      style={styles.dashView}
+    >
+      <View style={{ paddingVertical: 15, backgroundColor: 'green' }}>
+        <View style={{ paddingRight: padding }} />
+      </View>
+    </Pressable>
   );
-}
+};
 
 export default Dash;
 
 const styles = StyleSheet.create({
   dashView: {
     paddingVertical: 15,
-    paddingHorizontal: 35,
-    backgroundColor: COLORS.grey
+    paddingVertical: 0,
+    // paddingHorizontal: 35,
+    // paddingLeft: 35,
+    width: 70,
+    backgroundColor: COLORS.grey,
+    alignItems: 'flex-start',
+    justifyContent: 'flex-start',
+    overflow: 'hidden'
   },
 });
+
+

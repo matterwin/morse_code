@@ -14,7 +14,10 @@ const MorseCode = ({
   setLetterPhraseIndex, 
   setWordSpace,
   setLetterSpace,
-  setBgColor
+  setBgColor,
+  pressed,
+  padding,
+  setPadding
 }) => {
   useEffect(() => {
     generateMorseCode(phrase, setCodeSequence);
@@ -53,7 +56,12 @@ const MorseCode = ({
 
   return (
     codeSequence[codeSequenceIndex] === '.' ? <Dot /> : 
-      codeSequence[codeSequenceIndex] === '-' ? <Dash /> : <></>
+      codeSequence[codeSequenceIndex] === '-' ? 
+      <Dash 
+        pressed={pressed} 
+        padding={padding} 
+        setPadding={setPadding}
+      /> : <></>
   );
 };
 
