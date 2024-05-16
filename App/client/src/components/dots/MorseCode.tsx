@@ -17,14 +17,20 @@ const MorseCode = ({
   setBgColor,
   pressed,
   padding,
-  setPadding
+  setPadding,
+  pressInWhileNextSymbol,
+  setPressInWhileNextSymbol
 }) => {
   useEffect(() => {
     generateMorseCode(phrase, setCodeSequence);
   }, [phrase]);
 
   useEffect(() => {
-    if(codeSequenceIndex < codeSequence.length) {
+    if (codeSequenceIndex < codeSequence.length) {
+      setPadding(10);
+      if (pressed) {
+        setPressInWhileNextSymbol(true);
+      }
       if (codeSequence[codeSequenceIndex] === '/') {
         setWordSpace(true);
         setTimeout(() => {
@@ -55,13 +61,23 @@ const MorseCode = ({
   },[codeSequenceIndex]);
 
   return (
-    codeSequence[codeSequenceIndex] === '.' ? <Dot /> : 
+    codeSequence[codeSequenceIndex] === '.' ? 
+      <Dot 
+        pressed={pressed} 
+        padding={padding} 
+        setPadding={setPadding}
+        setCodeSequenceIndex={setCodeSequenceIndex}
+        pressInWhileNextSymbol={pressInWhileNextSymbol}
+      /> : 
       codeSequence[codeSequenceIndex] === '-' ? 
       <Dash 
         pressed={pressed} 
         padding={padding} 
         setPadding={setPadding}
-      /> : <></>
+        setCodeSequenceIndex={setCodeSequenceIndex}
+        pressInWhileNextSymbol={pressInWhileNextSymbol}
+      /> : 
+      <></>
   );
 };
 

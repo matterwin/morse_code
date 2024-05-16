@@ -1,26 +1,57 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Pressable, View, StyleSheet } from "react-native";
 import { COLORS } from '../../constants';
 
-const Dash = ({ pressed, padding, setPadding }) => {
+const Dash = ({ pressed, padding, setPadding, setCodeSequenceIndex, pressInWhileNextSymbol }) => {
+  const innerViewRef = useRef(null);
+  const dashViewRef = useRef(null);
+  const [innerWidth, setInnerWidth] = useState(0);
+  const [dashWidth, setDashWidth] = useState(0);
 
   useEffect(() => {
-    console.log(pressed);
-    if (pressed) {
+    if (pressed && !pressInWhileNextSymbol) {
       const interval = setInterval(() => {
-        setPadding(prevPadding => prevPadding + 1);
+        setPadding(prevPadding => prevPadding + 5);
       }, 10);
 
       return () => clearInterval(interval);
+    } else if (!pressed) {
+      setPadding(10);
     }
   }, [pressed]);
 
+  const onInnerLayout = (event) => {
+    const { width } = event.nativeEvent.layout;
+    setInnerWidth(width);
+  };
+
+  const onDashLayout = (event) => {
+    const { width } = event.nativeEvent.layout;
+    setDashWidth(width);
+  };
+
+  useEffect(() => {
+    if (innerWidth && dashWidth) {
+      console.log(`Inner view width: ${innerWidth}, Dash view width: ${dashWidth}`);
+      if (innerWidth >= dashWidth) {
+        setCodeSequenceIndex(prevCodeSequenceIndex => prevCodeSequenceIndex+1);
+        console.log("Inner view width is greater than or equal to Dash view width.");
+      }
+    }
+  }, [innerWidth, dashWidth]);
+
   return (
     <Pressable
+      ref={dashViewRef}
       style={styles.dashView}
+      onLayout={onDashLayout}
     >
-      <View style={{ paddingVertical: 15, backgroundColor: 'green' }}>
-        <View style={{ paddingRight: padding }} />
+      <View style={{ paddingVertical: 15, backgroundColor: '#007828'}}>
+        <View
+          ref={innerViewRef}
+          style={{ paddingRight: padding }}
+          onLayout={onInnerLayout}
+        />
       </View>
     </Pressable>
   );
@@ -41,5 +72,4 @@ const styles = StyleSheet.create({
     overflow: 'hidden'
   },
 });
-
 

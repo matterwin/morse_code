@@ -6,6 +6,7 @@ import SearchModal from '../components/modals/SearchModal.tsx';
 import MorseCode from '../components/dots/MorseCode.tsx';
 import Dot from '../components/dots/Dot.tsx';
 import { morseCodeMap } from '../components/dots/MorseCodeMap.tsx';
+import { Audio } from 'expo-av';
 
 const letterMorse = (text) => {
   if(text) {
@@ -30,7 +31,7 @@ const Dummy2 = ({ route }) => {
   const [letterPhraseIndex, setLetterPhraseIndex] = useState(0);
 
   const [modalVisible, setModalVisible] = useState(false);
-  const [volume, setVolume] = useState(true);
+  const [volume, setVolume] = useState(false);
 
   const [isPressed, setIsPressed] = useState(false);
   const [isPressedIn, setIsPressedIn] = useState(false);
@@ -40,6 +41,10 @@ const Dummy2 = ({ route }) => {
 
   const [pressed, setPressed] = useState(false);
   const [padding, setPadding] = useState(10);
+
+  const [sound, setSound] = useState();
+
+  const [pressInWhileNextSymbol, setPressInWhileNextSymbol] = useState(false);
 
   useEffect(() => {
     console.log(selectedItem);
@@ -59,10 +64,43 @@ const Dummy2 = ({ route }) => {
     }, 30);
   };
 
-  // useEffect(() => {
-  //   console.log(morseCodeMap[letterPhrase[letterPhraseIndex]]);
-  //   console.log(codeSequence);
-  // },[codeSequence])
+  const handlePressIn = async () => {
+    if (volume) {
+      playSound(); 
+    }
+    setIsPressedIn(true);
+    setPressed(true);
+  };
+
+  const handlePressOut = () => {
+    setIsPressedIn(false);
+    setPressInWhileNextSymbol(false);
+    setPressed(false);
+  };
+
+  async function playSound() {
+    console.log('Loading Sound');
+    const { sound } = await Audio.Sound.createAsync(require('../../assets/beep.wav'));
+    setSound(sound);
+
+    console.log('Playing Sound');
+    await sound.playAsync();
+  }
+  
+  useEffect(() => {
+    return sound
+      ? () => {
+          console.log('Unloading Sound');
+          sound.unloadAsync();
+        }
+      : undefined;
+  }, [sound]);
+
+  // show morse sequence
+  useEffect(() => {
+    console.log(morseCodeMap[letterPhrase[letterPhraseIndex]]);
+    console.log(codeSequence);
+  },[codeSequence])
 
   return (
     <SafeAreaView style={styles.container}>
@@ -79,7 +117,7 @@ const Dummy2 = ({ route }) => {
         }
         {!wordSpace && !letterSpace &&
           <>
-            <Text>{letterMorse(letterPhrase[letterPhraseIndex])}</Text>
+            <Text style={styles.codeText}>{letterMorse(letterPhrase[letterPhraseIndex])}</Text>
             <Text style={styles.phraseText}>{letterPhrase[letterPhraseIndex]}</Text>
           </>
         }
@@ -96,6 +134,8 @@ const Dummy2 = ({ route }) => {
           pressed={pressed}
           padding={padding}
           setPadding={setPadding}
+          pressInWhileNextSymbol={pressInWhileNextSymbol}
+          setPressInWhileNextSymbol={setPressInWhileNextSymbol}
         />
       </View>
       <View style={styles.middleView}>
@@ -144,12 +184,12 @@ const Dummy2 = ({ route }) => {
           isPressedIn && { backgroundColor: 'rgba(255, 255, 255, 0.35)' }
         ]}
         onPress={handlePress}
-        onPressIn={() => {setIsPressedIn(true); setPressed(true); console.log("in")}}
-        onPressOut={() => {setIsPressedIn(false); setPressed(false); console.log("out")}}
+        onPressIn={handlePressIn}
+        onPressOut={handlePressOut}
       >
         <View>
           <Pressable onPress={() => setPadding(10)}>
-          <Text style={{ color: '#ccc' }}>Tap here</Text>
+          <Text style={{ color: '#ccc', fontSize: 20 }}>TAP HERE</Text>
           </Pressable>
         </View>
       </Pressable>
@@ -181,20 +221,25 @@ const styles = StyleSheet.create({
   },
   bottomView: {
     flex: 1,
+    width: '100%',
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: '#a3a3a3',
     height: '50%',
-    borderWidth: 1,
+    borderWidth: 2,
     borderColor: 'transparent'
   },
   pressed: {
-    borderColor: '#ccc',
+    borderColor: '#fff',
     // backgroundColor: 'rgba(255, 255, 255, 0.95)',
   },
   phraseText: {
-    fontSize: 80,
+    fontSize: 85,
     fontWeight: '600',
+    color: COLORS.grey
+  },
+  codeText: {
+    fontSize: 35,
     color: COLORS.grey
   },
 });
