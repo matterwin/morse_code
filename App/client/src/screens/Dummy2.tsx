@@ -44,38 +44,50 @@ const Dummy2 = ({ route }) => {
 
   const [sound, setSound] = useState();
 
+  const [isDisabled, setIsDisabled] = useState(false);
+
   const [pressInWhileNextSymbol, setPressInWhileNextSymbol] = useState(false);
 
-  useEffect(() => {
+  const resetStates = () => {
     console.log(selectedItem);
     setLetterPhrase(route.params?.selectedItem || 'A')
     setLetterPhraseIndex(0);
     setCodeSequenceIndex(0);
     setBgColor('#ffd35c');
     setPadding(10);
+  };
+
+  useEffect(() => {
+    resetStates();
   },[selectedItem]);
 
   const handlePress = () => {
     // setCodeSequenceIndex(prev => prev+1);
-    setIsPressed(true);
-    setIsPressedIn(false);
-    setTimeout(() => {
-      setIsPressed(false);
-    }, 30);
+    if (!isDisabled) {
+      setIsPressed(true);
+      setIsPressedIn(false);
+      setTimeout(() => {
+        setIsPressed(false);
+      }, 30);
+    }
   };
 
   const handlePressIn = async () => {
-    if (volume) {
-      playSound(); 
+    if (!isDisabled) { 
+      if (volume) {
+        playSound(); 
+      }
+      setIsPressedIn(true);
+      setPressed(true);
     }
-    setIsPressedIn(true);
-    setPressed(true);
   };
 
   const handlePressOut = () => {
-    setIsPressedIn(false);
-    setPressInWhileNextSymbol(false);
-    setPressed(false);
+    if (!isDisabled) {
+      setIsPressedIn(false);
+      setPressInWhileNextSymbol(false);
+      setPressed(false);
+    }
   };
 
   async function playSound() {
@@ -136,46 +148,24 @@ const Dummy2 = ({ route }) => {
           setPadding={setPadding}
           pressInWhileNextSymbol={pressInWhileNextSymbol}
           setPressInWhileNextSymbol={setPressInWhileNextSymbol}
+          setIsDisabled={setIsDisabled}
         />
       </View>
       <View style={styles.middleView}>
-        <Pressable style={{ paddingVertical: 20 }} onPress={() => setModalVisible(true)}>
-         <Icon 
-            name={'repeat'} 
-            size={35} 
-            color={'#ccc'} 
-          />
-        </Pressable>
-        <Pressable style={{ paddingVertical: 20 }} onPress={() => setVolume(!volume)}>
+        <Pressable style={{ paddingVertical: 20, marginLeft: 15 }} onPress={() => setVolume(!volume)}>
           <Icon 
             name={volume ? 'volume-high' : 'volume-mute'} 
             size={35} 
             color={'#ccc'} 
           />
         </Pressable>
-                <Pressable style={{ paddingVertical: 19 }} onPress={() => setModalVisible(true)}>
+        <Pressable style={{ paddingVertical: 20, marginRight: 15 }} onPress={() => setModalVisible(true)}>
          <Icon 
             name={'search'} 
             size={34} 
             color={'#ccc'} 
           />
         </Pressable>
-        <Pressable style={{ paddingVertical: 20 }} onPress={() => setModalVisible(true)}>
-         <Icon 
-            name={'arrow-undo'} 
-            size={35} 
-            color={'#ccc'} 
-          />
-        </Pressable>
-
-        <Pressable style={{ paddingVertical: 20 }} onPress={() => setModalVisible(true)}>
-         <Icon 
-            name={'arrow-redo'} 
-            size={35} 
-            color={'#ccc'} 
-          />
-        </Pressable>
-        <SearchModal modalVisible={modalVisible} setModalVisible={setModalVisible}/>
       </View>
       <Pressable 
         style={[
@@ -186,6 +176,7 @@ const Dummy2 = ({ route }) => {
         onPress={handlePress}
         onPressIn={handlePressIn}
         onPressOut={handlePressOut}
+        disabled={isDisabled}
       >
         <View>
           <Pressable onPress={() => setPadding(10)}>
@@ -193,6 +184,9 @@ const Dummy2 = ({ route }) => {
           </Pressable>
         </View>
       </Pressable>
+      <View style={{ display: (modalVisible) ? 'visible' : 'none' }}>
+        <SearchModal modalVisible={modalVisible} setModalVisible={setModalVisible}/>
+      </View>
     </SafeAreaView>
   );
 }
@@ -216,7 +210,7 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.grey,
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'center',
+    justifyContent: 'space-between',
     gap: 15,
   },
   bottomView: {
@@ -241,6 +235,6 @@ const styles = StyleSheet.create({
   codeText: {
     fontSize: 35,
     color: COLORS.grey
-  },
+  }
 });
 

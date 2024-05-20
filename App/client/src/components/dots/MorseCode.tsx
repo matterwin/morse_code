@@ -19,7 +19,8 @@ const MorseCode = ({
   padding,
   setPadding,
   pressInWhileNextSymbol,
-  setPressInWhileNextSymbol
+  setPressInWhileNextSymbol,
+  setIsDisabled
 }) => {
   useEffect(() => {
     generateMorseCode(phrase, setCodeSequence);
@@ -47,11 +48,15 @@ const MorseCode = ({
         }, 150);
       } else {
         // do timeout for changing between symbols of 1 letter 
-        // setTimeout(() => {
-        //   setLetterSpace(false);
-        //   setCodeSequenceIndex(prev => prev+1);
-        //   setLetterPhraseIndex(prev => prev+1);
-        // }, 50);
+        // if (codeSequenceIndex !== 0) {
+        //   setIsDisabled(true); 
+        //   setTimeout(() => {
+        //     console.log("symbol space");
+        //     setIsDisabled(false);
+        //   }, 5000);
+        // } else {
+        //   setIsDisabled(false);
+        // }
       }
     } else {
       if(codeSequence.length > 0) {
