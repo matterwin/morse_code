@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { TouchableOpacity, SafeAreaView, Button, Text, View, StyleSheet, Image, Pressable, FlatList, TextInput } from "react-native";
+import { StatusBar } from 'expo-status-bar';
 import { useNavigation } from '@react-navigation/native';
 import { COLORS } from '../constants';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -27,6 +28,7 @@ const Dummy1 = () => {
 
   return (
     <View style={styles.container}>
+      <StatusBar style="light" translucent={true}/>
       <BlurView intensity={10} style={styles.overlay}>
         <LinearGradient 
           colors={['rgba(0,0,0,0.75)', 'rgba(0,0,0,0.45)', 'rgba(0,0,0,0.15)', 'transparent']}

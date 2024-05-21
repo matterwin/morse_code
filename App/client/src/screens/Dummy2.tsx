@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { SafeAreaView, Button, Text, View, StyleSheet, Image, TextInput, TouchableWithoutFeedback, Keyboard, Pressable } from "react-native";
+import { StatusBar } from 'expo-status-bar';
 import { COLORS } from '../constants';
 import Icon from 'react-native-vector-icons/Ionicons';
 import SearchModal from '../components/modals/SearchModal.tsx';
@@ -48,6 +49,23 @@ const Dummy2 = ({ route }) => {
 
   const [pressInWhileNextSymbol, setPressInWhileNextSymbol] = useState(false);
 
+  const [timer, setTimer] = useState(0);
+  const [clock, setClock] = useState(0);
+
+  useEffect(() => {
+    if (codeSequenceIndex !== 0) {
+      setClock(timer);
+      let interval = setInterval(() => {
+        setClock(prevClock => {
+          prevClock <= 1 && clearInterval(interval);
+          return prevClock - 1;
+        })
+      }, 250);
+
+      return () => clearInterval(interval);
+    }
+  }, [timer, codeSequenceIndex]);
+
   const resetStates = () => {
     console.log(selectedItem);
     setLetterPhrase(route.params?.selectedItem || 'A')
@@ -55,6 +73,8 @@ const Dummy2 = ({ route }) => {
     setCodeSequenceIndex(0);
     setBgColor('#ffd35c');
     setPadding(10);
+    setTimer(0);
+    setClock(0);
   };
 
   useEffect(() => {
@@ -63,52 +83,48 @@ const Dummy2 = ({ route }) => {
 
   const handlePress = () => {
     // setCodeSequenceIndex(prev => prev+1);
-    if (!isDisabled) {
+    // if (!isDisabled) {
       setIsPressed(true);
       setIsPressedIn(false);
       setTimeout(() => {
         setIsPressed(false);
       }, 30);
-    }
+    // }
   };
 
   const handlePressIn = async () => {
-    if (!isDisabled) { 
+    /* if (!isDisabled) {  */
       if (volume) {
         playSound(); 
       }
       setIsPressedIn(true);
       setPressed(true);
-    }
+    /* } */
   };
 
   const handlePressOut = () => {
-    if (!isDisabled) {
+    // if (!isDisabled) {
       setIsPressedIn(false);
       setPressInWhileNextSymbol(false);
       setPressed(false);
-    }
+    // }
   };
 
   async function playSound() {
-    console.log('Loading Sound');
     const { sound } = await Audio.Sound.createAsync(require('../../assets/beep.wav'));
     setSound(sound);
 
-    console.log('Playing Sound');
     await sound.playAsync();
   }
   
   useEffect(() => {
     return sound
       ? () => {
-          console.log('Unloading Sound');
           sound.unloadAsync();
         }
       : undefined;
   }, [sound]);
 
-  // show morse sequence
   useEffect(() => {
     console.log(morseCodeMap[letterPhrase[letterPhraseIndex]]);
     console.log(codeSequence);
@@ -116,24 +132,28 @@ const Dummy2 = ({ route }) => {
 
   return (
     <SafeAreaView style={styles.container}>
+    <StatusBar style="dark" translucent={true}/>
       <View style={[styles.topView, { backgroundColor: bgColor }]}>
         {wordSpace && !letterSpace &&
           <>
             <Text style={styles.phraseText}>/</Text>
+            {(clock >= 1) && <Text>{clock}</Text>}
           </>
         }
         {!wordSpace && letterSpace && 
           <>
             <Text style={styles.phraseText}>_</Text>
+            {(clock >= 1) && <Text>{clock}</Text>}
           </>
         }
         {!wordSpace && !letterSpace &&
           <>
             <Text style={styles.codeText}>{letterMorse(letterPhrase[letterPhraseIndex])}</Text>
             <Text style={styles.phraseText}>{letterPhrase[letterPhraseIndex]}</Text>
+            {(clock >= 1) && <Text>{clock}</Text>}
           </>
         }
-        <MorseCode
+        {(clock <= 0) && <MorseCode
           phrase={letterPhrase}
           codeSequence={codeSequence}
           setCodeSequence={setCodeSequence}
@@ -149,7 +169,10 @@ const Dummy2 = ({ route }) => {
           pressInWhileNextSymbol={pressInWhileNextSymbol}
           setPressInWhileNextSymbol={setPressInWhileNextSymbol}
           setIsDisabled={setIsDisabled}
+          timer={timer}
+          setTimer={setTimer}
         />
+        }
       </View>
       <View style={styles.middleView}>
         <Pressable style={{ paddingVertical: 20, marginLeft: 15 }} onPress={() => setVolume(!volume)}>
@@ -176,7 +199,6 @@ const Dummy2 = ({ route }) => {
         onPress={handlePress}
         onPressIn={handlePressIn}
         onPressOut={handlePressOut}
-        disabled={isDisabled}
       >
         <View>
           <Pressable onPress={() => setPadding(10)}>

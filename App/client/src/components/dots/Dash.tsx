@@ -18,10 +18,15 @@ const Dash = ({ pressed, padding, setPadding, setCodeSequenceIndex, pressInWhile
   const dashViewRef = useRef(null);
   const [innerWidth, setInnerWidth] = useState(0);
   const [dashWidth, setDashWidth] = useState(0);
+  const [error, setError] = useState(false);
+  const [passed, setPassed] = useState(false);
 
   useEffect(() => {
-    if (pressed && !pressInWhileNextSymbol) {
+    if (innerWidth <= dashWidth && pressed) {
       const interval = setInterval(() => {
+        if (innerWidth >= dashWidth) {
+          clearInterval(interval);
+        }
         setPadding(prevPadding => prevPadding + 5);
       }, 10);
 
@@ -42,17 +47,26 @@ const Dash = ({ pressed, padding, setPadding, setCodeSequenceIndex, pressInWhile
   };
 
   useEffect(() => {
-    if (innerWidth && dashWidth) {
-      console.log(`Inner view width: ${innerWidth}, Dash view width: ${dashWidth}`);
-      if (innerWidth >= dashWidth) {
-        setCodeSequenceIndex(prevCodeSequenceIndex => prevCodeSequenceIndex+1);
-        console.log("Inner view width is greater than or equal to Dash view width.");
-      } else {
-        if(!pressed) {
-          startShake();
-        }
+    console.log(`Inner view width: ${innerWidth}, Dash view width: ${dashWidth}`);
+
+    if (innerWidth <= dashWidth) {
+      if(!pressed) {
+        startShake();
+        setError(true);
+        setTimeout(() => {
+          setError(false);
+        }, 300);
       }
+    } else {
+      if (innerWidth >= dashWidth) {
+        setPassed(true);
+        setCodeSequenceIndex(prevCodeSequenceIndex => prevCodeSequenceIndex+1);
+        setTimeout(() => {
+          setPassed(false);
+        }, 1000);
+      }    
     }
+
   }, [innerWidth, dashWidth]);
 
   const shakeStyle = useAnimatedStyle(() => {
@@ -71,19 +85,23 @@ const Dash = ({ pressed, padding, setPadding, setCodeSequenceIndex, pressInWhile
         withTiming(10, { duration: 50, easing: Easing.linear }),
         withTiming(0, { duration: 50, easing: Easing.linear })
       ),
-      2, // Number of shakes
-      true // Reverse the animation
+      2,
+      true
     );
   };
 
   return (
     <Animated.View
       ref={dashViewRef}
-      style={[styles.dashView, shakeStyle]}
+      style={[
+        styles.dashView,
+        shakeStyle,
+        { borderColor: error ? '#ff3700' : passed ? '#49eb34' : 'transparent' }
+      ]}
       onLayout={onDashLayout}
       onTouchStart={() => startShake()}
     >
-      <View style={{ paddingVertical: 15, backgroundColor: '#007828'}}>
+      <View style={{ paddingVertical: 15, backgroundColor: '#007828' }}>
         <View
           ref={innerViewRef}
           style={{ paddingRight: padding }}
@@ -102,11 +120,13 @@ const styles = StyleSheet.create({
     paddingVertical: 0,
     // paddingHorizontal: 35,
     // paddingLeft: 35,
-    width: 70,
+    width: 75,
     backgroundColor: COLORS.grey,
     alignItems: 'flex-start',
     justifyContent: 'flex-start',
-    overflow: 'hidden'
+    overflow: 'hidden',
+    borderColor: 'transparent',
+    borderWidth: 3
   },
 });
 
