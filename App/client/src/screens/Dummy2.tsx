@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { SafeAreaView, Button, Text, View, StyleSheet, Image, TextInput, TouchableWithoutFeedback, Keyboard, Pressable } from "react-native";
+import { SafeAreaView, Button, Text, View, StyleSheet, Image, TextInput, TouchableWithoutFeedback, Keyboard, Pressable, Dimensions } from "react-native";
 import { StatusBar } from 'expo-status-bar';
 import { COLORS } from '../constants';
 import Icon from 'react-native-vector-icons/Ionicons';
@@ -24,7 +24,10 @@ function isAlphabetical(char) {
   return /[a-zA-Z]/.test(char);
 }
 
+const { width, height } = Dimensions.get('window');
+
 const Dummy2 = ({ route }) => {
+  const fontSize = width * 0.15;
   const selectedItem  = route.params?.selectedItem || 'A'; 
   const [letterPhrase, setLetterPhrase] = useState(selectedItem);
   const [codeSequence, setCodeSequence] = useState('');
@@ -38,7 +41,7 @@ const Dummy2 = ({ route }) => {
   const [isPressedIn, setIsPressedIn] = useState(false);
   const [wordSpace, setWordSpace] = useState(false);
   const [letterSpace, setLetterSpace] = useState(false);
-  const [bgColor, setBgColor] = useState('#ffd35c');
+  const [bgColor, setBgColor] = useState(COLORS.yellow);
 
   const [pressed, setPressed] = useState(false);
   const [padding, setPadding] = useState(10);
@@ -52,7 +55,10 @@ const Dummy2 = ({ route }) => {
   const [timer, setTimer] = useState(0);
   const [clock, setClock] = useState(0);
 
+  const [intervalId, setIntervalId] = useState(null);
+
   useEffect(() => {
+    setBgColor(COLORS.yellow);
     if (codeSequenceIndex !== 0) {
       setClock(timer);
       let interval = setInterval(() => {
@@ -82,32 +88,32 @@ const Dummy2 = ({ route }) => {
   },[selectedItem]);
 
   const handlePress = () => {
-    // setCodeSequenceIndex(prev => prev+1);
-    // if (!isDisabled) {
-      setIsPressed(true);
-      setIsPressedIn(false);
-      setTimeout(() => {
-        setIsPressed(false);
-      }, 30);
-    // }
+    setIsPressed(true);
+    setIsPressedIn(false);
+    setTimeout(() => {
+      setIsPressed(false);
+    }, 30);
   };
 
   const handlePressIn = async () => {
-    /* if (!isDisabled) {  */
-      if (volume) {
-        playSound(); 
-      }
-      setIsPressedIn(true);
-      setPressed(true);
-    /* } */
+    if (volume && !intervalId) {
+      const id = setInterval(() => {
+        playSound();
+      }, 10);
+      setIntervalId(id);
+    }
+    setIsPressedIn(true);
+    setPressed(true);
   };
 
   const handlePressOut = () => {
-    // if (!isDisabled) {
-      setIsPressedIn(false);
-      setPressInWhileNextSymbol(false);
-      setPressed(false);
-    // }
+    setIsPressedIn(false);
+    setPressInWhileNextSymbol(false);
+    setPressed(false);
+    if (volume && intervalId) {
+      clearInterval(intervalId);
+      setIntervalId(null);
+    }
   };
 
   async function playSound() {
@@ -149,7 +155,7 @@ const Dummy2 = ({ route }) => {
         {!wordSpace && !letterSpace &&
           <>
             <Text style={styles.codeText}>{letterMorse(letterPhrase[letterPhraseIndex])}</Text>
-            <Text style={styles.phraseText}>{letterPhrase[letterPhraseIndex]}</Text>
+            <Text style={[styles.phraseText, { fontSize: fontSize }]}>{letterPhrase[letterPhraseIndex]}</Text>
             {(clock >= 1) && <Text>{clock}</Text>}
           </>
         }
@@ -162,7 +168,6 @@ const Dummy2 = ({ route }) => {
           setLetterPhraseIndex={setLetterPhraseIndex}
           setWordSpace={setWordSpace}
           setLetterSpace={setLetterSpace}
-          setBgColor={setBgColor}
           pressed={pressed}
           padding={padding}
           setPadding={setPadding}
@@ -171,6 +176,9 @@ const Dummy2 = ({ route }) => {
           setIsDisabled={setIsDisabled}
           timer={timer}
           setTimer={setTimer}
+          clock={clock}
+          bgColor={bgColor}
+          setBgColor={setBgColor}
         />
         }
       </View>
@@ -202,7 +210,7 @@ const Dummy2 = ({ route }) => {
       >
         <View>
           <Pressable onPress={() => setPadding(10)}>
-          <Text style={{ color: '#ccc', fontSize: 20 }}>TAP HERE</Text>
+          <Text style={{ color: (isPressedIn) ? 'rgba(255, 255, 255, 0)' : '#ccc', fontSize: 20 }}>TOUCH</Text>
           </Pressable>
         </View>
       </Pressable>
@@ -224,7 +232,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#ffd35c',
+    backgroundColor: COLORS.yellow,
     height: '40%',
   },
   middleView: {
@@ -240,9 +248,9 @@ const styles = StyleSheet.create({
     width: '100%',
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#a3a3a3',
+    backgroundColor: COLORS.lightGrey,
     height: '50%',
-    borderWidth: 2,
+    borderWidth: 4,
     borderColor: 'transparent'
   },
   pressed: {
@@ -250,7 +258,7 @@ const styles = StyleSheet.create({
     // backgroundColor: 'rgba(255, 255, 255, 0.95)',
   },
   phraseText: {
-    fontSize: 85,
+    fontSize: '120%',
     fontWeight: '600',
     color: COLORS.grey
   },

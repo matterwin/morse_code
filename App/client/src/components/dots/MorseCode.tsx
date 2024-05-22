@@ -14,7 +14,6 @@ const MorseCode = ({
   setLetterPhraseIndex, 
   setWordSpace,
   setLetterSpace,
-  setBgColor,
   pressed,
   padding,
   setPadding,
@@ -22,7 +21,10 @@ const MorseCode = ({
   setPressInWhileNextSymbol,
   setIsDisabled,
   timer,
-  setTimer
+  setTimer,
+  clock,
+  bgColor,
+  setBgColor,
 }) => {
   useEffect(() => {
     generateMorseCode(phrase, setCodeSequence);
@@ -38,7 +40,7 @@ const MorseCode = ({
           setWordSpace(false);
           setCodeSequenceIndex(prev => prev+1);
           setLetterPhraseIndex(prev => prev+2);
-        }, 350);
+        }, 1750);
       } else if(codeSequence[codeSequenceIndex] === ' ') {
         setLetterSpace(true);
         setTimer(15);
@@ -46,13 +48,13 @@ const MorseCode = ({
           setLetterSpace(false);
           setCodeSequenceIndex(prev => prev+1);
           setLetterPhraseIndex(prev => prev+1);
-        }, 150);
+        }, 3750);
       } else {
         setTimer(2);
       }
     } else {
       if(codeSequence.length > 0) {
-        setBgColor('#a3a3a3');
+        setBgColor(COLORS.lightGrey);
         setTimer(0);
       }
     }
@@ -66,6 +68,9 @@ const MorseCode = ({
         setPadding={setPadding}
         setCodeSequenceIndex={setCodeSequenceIndex}
         pressInWhileNextSymbol={pressInWhileNextSymbol}
+        clock={clock}
+        bgColor={bgColor}
+        setBgColor={setBgColor}
       /> : 
       codeSequence[codeSequenceIndex] === '-' ? 
       <Dash 
@@ -74,6 +79,9 @@ const MorseCode = ({
         setPadding={setPadding}
         setCodeSequenceIndex={setCodeSequenceIndex}
         pressInWhileNextSymbol={pressInWhileNextSymbol}
+        clock={clock}
+        bgColor={bgColor}
+        setBgColor={setBgColor}
       /> : 
       <></>
   );

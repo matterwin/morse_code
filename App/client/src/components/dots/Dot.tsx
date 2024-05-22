@@ -12,7 +12,7 @@ import Animated, {
   withTiming
 } from 'react-native-reanimated';
 
-const Dot = ({ pressed, padding, setPadding, setCodeSequenceIndex, pressInWhileNextSymbol }) => {
+const Dot = ({ pressed, padding, setPadding, setCodeSequenceIndex, pressInWhileNextSymbol, timer, clock, bgColor, setBgColor }) => {
   const shake = useSharedValue(0);
   const innerViewRef = useRef(null);
   const dashViewRef = useRef(null);
@@ -20,9 +20,10 @@ const Dot = ({ pressed, padding, setPadding, setCodeSequenceIndex, pressInWhileN
   const [dashWidth, setDashWidth] = useState(0);
   const [error, setError] = useState(false);
   const [passed, setPassed] = useState(false);
+  const [tmpBgColor, setTmpBgColor] = useState(bgColor);
 
   useEffect(() => {
-    if (innerWidth <= dashWidth && pressed) {
+    if ((innerWidth <= dashWidth) && pressed) {
       const interval = setInterval(() => {
         if (innerWidth >= dashWidth) {
           clearInterval(interval);
@@ -50,24 +51,20 @@ const Dot = ({ pressed, padding, setPadding, setCodeSequenceIndex, pressInWhileN
     console.log(`Inner view width: ${innerWidth}, Dash view width: ${dashWidth}`);
 
     if (innerWidth <= dashWidth) {
-      if(!pressed) {
+      if (!pressed && (innerWidth !== 10 && innerWidth !== 0)) {
         startShake();
         setError(true);
+        setBgColor(COLORS.red);
         setTimeout(() => {
           setError(false);
+          setBgColor(tmpBgColor);
         }, 300);
       }
     } else {
-      if (innerWidth >= dashWidth) {
-        setPassed(true);
-        setCodeSequenceIndex(prevCodeSequenceIndex => prevCodeSequenceIndex+1);
-        setTimeout(() => {
-          setPassed(false);
-        }, 1000);
-      }    
+      setCodeSequenceIndex(prevCodeSequenceIndex => prevCodeSequenceIndex+1);
     }
 
-  }, [innerWidth, dashWidth]);
+  }, [pressed, innerWidth, dashWidth]);
 
   const shakeStyle = useAnimatedStyle(() => {
     return {
@@ -101,7 +98,7 @@ const Dot = ({ pressed, padding, setPadding, setCodeSequenceIndex, pressInWhileN
       onLayout={onDashLayout}
       onTouchStart={() => startShake()}
     >
-      <View style={{ paddingVertical: 15, backgroundColor: '#007828' }}>
+      <View style={{ paddingVertical: 15, backgroundColor: COLORS.green }}>
         <View
           ref={innerViewRef}
           style={{ paddingRight: padding }}
@@ -116,17 +113,16 @@ export default Dot;
 
 const styles = StyleSheet.create({
   dashView: {
-    paddingVertical: 15,
     paddingVertical: 0,
-    // paddingHorizontal: 35,
-    // paddingLeft: 35,
-    width: 45,
+    width: 30,
+    borderRadius: '100%',
     backgroundColor: COLORS.grey,
     alignItems: 'flex-start',
     justifyContent: 'flex-start',
     overflow: 'hidden',
     borderColor: 'transparent',
-    borderWidth: 3
+    // borderWidth: 4
   },
 });
+
 
