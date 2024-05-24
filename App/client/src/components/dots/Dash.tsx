@@ -28,7 +28,7 @@ const Dash = ({ pressed, padding, setPadding, setCodeSequenceIndex, pressInWhile
         if (innerWidth >= dashWidth) {
           clearInterval(interval);
         }
-        setPadding(prevPadding => prevPadding + 5);
+        setPadding(prevPadding => prevPadding + 8);
       }, 10);
 
       return () => clearInterval(interval);
@@ -48,7 +48,7 @@ const Dash = ({ pressed, padding, setPadding, setCodeSequenceIndex, pressInWhile
   };
 
   useEffect(() => {
-    console.log(`Inner view width: ${innerWidth}, Dash view width: ${dashWidth}`);
+    // console.log(`Inner view width: ${innerWidth}, Dash view width: ${dashWidth}`);
 
     if (innerWidth <= dashWidth) {
       if (!pressed && (innerWidth !== 10 && innerWidth !== 0)) {

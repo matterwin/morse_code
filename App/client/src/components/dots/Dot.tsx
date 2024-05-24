@@ -48,7 +48,7 @@ const Dot = ({ pressed, padding, setPadding, setCodeSequenceIndex, pressInWhileN
   };
 
   useEffect(() => {
-    console.log(`Inner view width: ${innerWidth}, Dash view width: ${dashWidth}`);
+    // console.log(`Inner view width: ${innerWidth}, Dash view width: ${dashWidth}`);
 
     if (innerWidth <= dashWidth) {
       if (!pressed && (innerWidth !== 10 && innerWidth !== 0)) {

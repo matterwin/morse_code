@@ -1,13 +1,17 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { SafeAreaView, Button, Text, View, StyleSheet, Image, TextInput, TouchableWithoutFeedback, Keyboard, Pressable, Dimensions } from "react-native";
 import { StatusBar } from 'expo-status-bar';
 import { COLORS } from '../constants';
-import Icon from 'react-native-vector-icons/Ionicons';
+import IconFoundation from 'react-native-vector-icons/Foundation';
+import IconIon from 'react-native-vector-icons/Ionicons';
+import IconAwesome from 'react-native-vector-icons/FontAwesome';
+import IconAwesome5 from 'react-native-vector-icons/FontAwesome5';
 import SearchModal from '../components/modals/SearchModal.tsx';
 import MorseCode from '../components/dots/MorseCode.tsx';
 import Dot from '../components/dots/Dot.tsx';
 import { morseCodeMap } from '../components/dots/MorseCodeMap.tsx';
 import { Audio } from 'expo-av';
+import { useNavigation } from '@react-navigation/native';
 
 const letterMorse = (text) => {
   if(text) {
@@ -27,8 +31,10 @@ function isAlphabetical(char) {
 const { width, height } = Dimensions.get('window');
 
 const Dummy2 = ({ route }) => {
+  const navigation = useNavigation();
   const fontSize = width * 0.15;
   const selectedItem  = route.params?.selectedItem || 'A'; 
+
   const [letterPhrase, setLetterPhrase] = useState(selectedItem);
   const [codeSequence, setCodeSequence] = useState('');
   const [codeSequenceIndex, setCodeSequenceIndex] = useState(0);
@@ -55,7 +61,31 @@ const Dummy2 = ({ route }) => {
   const [timer, setTimer] = useState(0);
   const [clock, setClock] = useState(0);
 
-  const [intervalId, setIntervalId] = useState(null);
+  const soundRef = useRef(null);
+
+  useEffect(() => {
+    const loadSound = async () => {
+      const { sound } = await Audio.Sound.createAsync(
+        require('../../assets/beep.wav'),
+        { shouldPlay: false, isLooping: true }
+      );
+      soundRef.current = sound;
+
+      sound.setOnPlaybackStatusUpdate((status) => {
+        if (status.didJustFinish) {
+          sound.playAsync();
+        }
+      });
+    };
+
+    loadSound();
+
+    return () => {
+      if (soundRef.current) {
+        soundRef.current.unloadAsync();
+      }
+    };
+  }, [volume]);
 
   useEffect(() => {
     setBgColor(COLORS.yellow);
@@ -63,10 +93,10 @@ const Dummy2 = ({ route }) => {
       setClock(timer);
       let interval = setInterval(() => {
         setClock(prevClock => {
-          prevClock <= 1 && clearInterval(interval);
+          prevClock <= 0 && clearInterval(interval);
           return prevClock - 1;
         })
-      }, 250);
+      }, 100);
 
       return () => clearInterval(interval);
     }
@@ -96,40 +126,20 @@ const Dummy2 = ({ route }) => {
   };
 
   const handlePressIn = async () => {
-    if (volume && !intervalId) {
-      const id = setInterval(() => {
-        playSound();
-      }, 10);
-      setIntervalId(id);
-    }
     setIsPressedIn(true);
     setPressed(true);
-  };
-
-  const handlePressOut = () => {
-    setIsPressedIn(false);
-    setPressInWhileNextSymbol(false);
-    setPressed(false);
-    if (volume && intervalId) {
-      clearInterval(intervalId);
-      setIntervalId(null);
+    if (volume && soundRef.current && !pressed) {
+      await soundRef.current.playAsync();
     }
   };
 
-  async function playSound() {
-    const { sound } = await Audio.Sound.createAsync(require('../../assets/beep.wav'));
-    setSound(sound);
-
-    await sound.playAsync();
-  }
-  
-  useEffect(() => {
-    return sound
-      ? () => {
-          sound.unloadAsync();
-        }
-      : undefined;
-  }, [sound]);
+  const handlePressOut = async () => {
+    setIsPressedIn(false);
+    setPressed(false);
+    if (volume && soundRef.current && pressed) {
+      await soundRef.current.stopAsync();
+    }
+  };
 
   useEffect(() => {
     console.log(morseCodeMap[letterPhrase[letterPhraseIndex]]);
@@ -166,7 +176,9 @@ const Dummy2 = ({ route }) => {
           codeSequenceIndex={codeSequenceIndex}
           setCodeSequenceIndex={setCodeSequenceIndex}
           setLetterPhraseIndex={setLetterPhraseIndex}
+          wordSpace={wordSpace}
           setWordSpace={setWordSpace}
+          letterSpace={letterSpace}
           setLetterSpace={setLetterSpace}
           pressed={pressed}
           padding={padding}
@@ -183,20 +195,34 @@ const Dummy2 = ({ route }) => {
         }
       </View>
       <View style={styles.middleView}>
-        <Pressable style={{ paddingVertical: 20, marginLeft: 15 }} onPress={() => setVolume(!volume)}>
-          <Icon 
-            name={volume ? 'volume-high' : 'volume-mute'} 
-            size={35} 
+        <Pressable style={{ paddingVertical: 20, marginLeft: 20 }} onPress={() => navigation.navigate('Dummy1')}>
+          <IconIon
+            name={'arrow-back'} 
+            size={33} 
             color={'#ccc'} 
           />
         </Pressable>
-        <Pressable style={{ paddingVertical: 20, marginRight: 15 }} onPress={() => setModalVisible(true)}>
-         <Icon 
+        <Pressable style={{ paddingVertical: 10 }} onPress={() => resetStates()}>
+          <IconFoundation 
+            name={'refresh'} 
+            size={39} 
+            color={'#ccc'} 
+          />
+        </Pressable>
+        <Pressable style={{ paddingVertical: 20 }} onPress={() => setVolume(!volume)}>
+          <IconAwesome5
+            name={volume ? 'volume-up' : 'volume-mute'} 
+            size={33} 
+            color={'#ccc'} 
+          />
+        </Pressable>
+        <Pressable style={{ paddingVertical: 20, marginRight: 20 }} onPress={() => setModalVisible(true)}>
+         <IconIon
             name={'search'} 
             size={34} 
             color={'#ccc'} 
           />
-        </Pressable>
+        </Pressable> 
       </View>
       <Pressable 
         style={[
@@ -227,6 +253,15 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#000'
+  },
+  header: {
+    backgroundColor: 'rgba(10, 10, 10, 0.15)',
+    borderRadius: 50,
+    width: 50,
+    height: 50,
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   topView: {
     flex: 1,
@@ -263,7 +298,7 @@ const styles = StyleSheet.create({
     color: COLORS.grey
   },
   codeText: {
-    fontSize: 35,
+    fontSize: 45,
     color: COLORS.grey
   }
 });

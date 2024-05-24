@@ -12,7 +12,9 @@ const MorseCode = ({
   codeSequenceIndex, 
   setCodeSequenceIndex,
   setLetterPhraseIndex, 
+  wordSpace,
   setWordSpace,
+  letterSpace,
   setLetterSpace,
   pressed,
   padding,
@@ -33,24 +35,29 @@ const MorseCode = ({
   useEffect(() => {
     if (codeSequenceIndex < codeSequence.length) {
       setPadding(10);
+
       if (codeSequence[codeSequenceIndex] === '/') {
         setWordSpace(true);
         setTimer(7);
         setTimeout(() => {
-          setWordSpace(false);
           setCodeSequenceIndex(prev => prev+1);
           setLetterPhraseIndex(prev => prev+2);
-        }, 1750);
+        }, 700);
       } else if(codeSequence[codeSequenceIndex] === ' ') {
         setLetterSpace(true);
-        setTimer(15);
+        setTimer(3);
         setTimeout(() => {
-          setLetterSpace(false);
           setCodeSequenceIndex(prev => prev+1);
           setLetterPhraseIndex(prev => prev+1);
-        }, 3750);
+        }, 300);
       } else {
-        setTimer(2);
+        setLetterSpace(false);
+        setWordSpace(false);
+        if (codeSequenceIndex-1 >= 0 && (codeSequence[codeSequenceIndex-1] !== '/' && codeSequence[codeSequenceIndex-1] !== ' ')) {
+          setTimer(1)
+        } else {
+          console.log("new letter")
+        }
       }
     } else {
       if(codeSequence.length > 0) {
