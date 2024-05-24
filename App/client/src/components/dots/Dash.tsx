@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { Pressable, View, StyleSheet } from "react-native";
+import { Pressable, View, StyleSheet, Text } from "react-native";
 import { COLORS } from '../../constants';
 import Animated, {
   Easing,
@@ -12,7 +12,17 @@ import Animated, {
   withTiming
 } from 'react-native-reanimated';
 
-const Dash = ({ pressed, padding, setPadding, setCodeSequenceIndex, pressInWhileNextSymbol, timer, clock, bgColor, setBgColor }) => {
+const Dash = ({ 
+  pressed, 
+  padding, 
+  setPadding,
+  setCodeSequenceIndex,
+  pressInWhileNextSymbol,
+  bgColor, 
+  setBgColor,
+  pressTimer, 
+  setPressTimer 
+}) => {
   const shake = useSharedValue(0);
   const innerViewRef = useRef(null);
   const dashViewRef = useRef(null);
@@ -23,18 +33,47 @@ const Dash = ({ pressed, padding, setPadding, setCodeSequenceIndex, pressInWhile
   const [tmpBgColor, setTmpBgColor] = useState(bgColor);
 
   useEffect(() => {
-    if ((innerWidth <= dashWidth) && pressed) {
-      const interval = setInterval(() => {
-        if (innerWidth >= dashWidth) {
-          clearInterval(interval);
-        }
+     let interval;
+     let pressTimerInterval;
+     let timer;
+
+    if (pressed && pressTimer <= 0) {
+      const startTime = Date.now();
+
+      const updateElapsedTime = () => { 
+        setPressTimer(Date.now() - startTime);
+      }; 
+
+      pressTimerInterval = setInterval(updateElapsedTime, 1);
+
+      interval = setInterval(() => {
         setPadding(prevPadding => prevPadding + 8);
       }, 10);
 
-      return () => clearInterval(interval);
-    } else if (!pressed) {
+      timer = setTimeout(() => {
+        clearInterval(pressTimerInterval);
+        setCodeSequenceIndex(prevCodeSequenceIndex => prevCodeSequenceIndex + 1);
+      }, 300);
+
+    } else {
+      if (!pressed && pressTimer <= 300) {
+        startShake();
+        setError(true);
+        setBgColor(COLORS.red);
+        setTimeout(() => {
+          setError(false);
+          setBgColor(tmpBgColor);
+        }, 300);
+      }
       setPadding(10);
     }
+
+    return () => {
+      setPressTimer(0);
+      clearTimeout(timer);
+      clearInterval(pressTimerInterval);
+      clearInterval(interval);
+    };
   }, [pressed]);
 
   const onInnerLayout = (event) => {
@@ -46,25 +85,6 @@ const Dash = ({ pressed, padding, setPadding, setCodeSequenceIndex, pressInWhile
     const { width } = event.nativeEvent.layout;
     setDashWidth(width);
   };
-
-  useEffect(() => {
-    // console.log(`Inner view width: ${innerWidth}, Dash view width: ${dashWidth}`);
-
-    if (innerWidth <= dashWidth) {
-      if (!pressed && (innerWidth !== 10 && innerWidth !== 0)) {
-        startShake();
-        setError(true);
-        setBgColor(COLORS.red);
-        setTimeout(() => {
-          setError(false);
-          setBgColor(tmpBgColor);
-        }, 300);
-      }
-    } else {
-      setCodeSequenceIndex(prevCodeSequenceIndex => prevCodeSequenceIndex+1);
-    }
-
-  }, [pressed, innerWidth, dashWidth]);
 
   const shakeStyle = useAnimatedStyle(() => {
     return {
@@ -120,7 +140,6 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-start',
     overflow: 'hidden',
     borderColor: 'transparent',
-    // borderWidth: 4
   },
 });
 

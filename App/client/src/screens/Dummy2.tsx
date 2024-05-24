@@ -61,6 +61,8 @@ const Dummy2 = ({ route }) => {
   const [timer, setTimer] = useState(0);
   const [clock, setClock] = useState(0);
 
+  const [pressTimer, setPressTimer] = useState(0);
+
   const soundRef = useRef(null);
 
   useEffect(() => {
@@ -141,11 +143,11 @@ const Dummy2 = ({ route }) => {
     }
   };
 
-  useEffect(() => {
-    console.log(morseCodeMap[letterPhrase[letterPhraseIndex]]);
-    console.log(codeSequence);
-  },[codeSequence])
-
+  // useEffect(() => {
+  //   console.log(morseCodeMap[letterPhrase[letterPhraseIndex]]);
+  //   console.log(codeSequence);
+  // },[codeSequence])
+  //
   return (
     <SafeAreaView style={styles.container}>
     <StatusBar style="dark" translucent={true}/>
@@ -169,7 +171,7 @@ const Dummy2 = ({ route }) => {
             {(clock >= 1) && <Text>{clock}</Text>}
           </>
         }
-        {(clock <= 0) && <MorseCode
+        {(clock <= 0) && <><MorseCode
           phrase={letterPhrase}
           codeSequence={codeSequence}
           setCodeSequence={setCodeSequence}
@@ -191,7 +193,10 @@ const Dummy2 = ({ route }) => {
           clock={clock}
           bgColor={bgColor}
           setBgColor={setBgColor}
+          pressTimer={pressTimer}
+          setPressTimer={setPressTimer}
         />
+                    <Text>{pressTimer} ms</Text></>
         }
       </View>
       <View style={styles.middleView}>
@@ -235,9 +240,7 @@ const Dummy2 = ({ route }) => {
         onPressOut={handlePressOut}
       >
         <View>
-          <Pressable onPress={() => setPadding(10)}>
           <Text style={{ color: (isPressedIn) ? 'rgba(255, 255, 255, 0)' : '#ccc', fontSize: 20 }}>TOUCH</Text>
-          </Pressable>
         </View>
       </Pressable>
       <View style={{ display: (modalVisible) ? 'visible' : 'none' }}>

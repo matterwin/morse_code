@@ -27,6 +27,8 @@ const MorseCode = ({
   clock,
   bgColor,
   setBgColor,
+  pressTimer,
+  setPressTimer,
 }) => {
   useEffect(() => {
     generateMorseCode(phrase, setCodeSequence);
@@ -78,6 +80,8 @@ const MorseCode = ({
         clock={clock}
         bgColor={bgColor}
         setBgColor={setBgColor}
+        pressTimer={pressTimer}
+        setPressTimer={setPressTimer}
       /> : 
       codeSequence[codeSequenceIndex] === '-' ? 
       <Dash 
@@ -89,6 +93,8 @@ const MorseCode = ({
         clock={clock}
         bgColor={bgColor}
         setBgColor={setBgColor}
+        pressTimer={pressTimer}
+        setPressTimer={setPressTimer}
       /> : 
       <></>
   );
