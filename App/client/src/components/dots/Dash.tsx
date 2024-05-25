@@ -32,32 +32,39 @@ const Dash = ({
   const [passed, setPassed] = useState(false);
   const [tmpBgColor, setTmpBgColor] = useState(bgColor);
 
+  const [next, setNext] = useState(true);
+
   useEffect(() => {
      let interval;
      let pressTimerInterval;
      let timer;
 
-    if (pressed && pressTimer <= 0) {
+    if (pressed && pressTimer <= 0 && !next) {
       const startTime = Date.now();
 
       const updateElapsedTime = () => { 
-        setPressTimer(Date.now() - startTime);
+        const elapsedTime = Date.now() - startTime;
+        setPressTimer(elapsedTime);
+        setPadding((elapsedTime / 300) * 100);
       }; 
 
       pressTimerInterval = setInterval(updateElapsedTime, 1);
 
       interval = setInterval(() => {
-        setPadding(prevPadding => prevPadding + 8);
       }, 10);
 
       timer = setTimeout(() => {
         clearInterval(pressTimerInterval);
+        setNext(true);
+        setPadding(10);
+        setPressTimer(0);
         setCodeSequenceIndex(prevCodeSequenceIndex => prevCodeSequenceIndex + 1);
       }, 300);
-
     } else {
-      if (!pressed && pressTimer <= 300) {
+      setNext(false);
+      if (!pressed && pressTimer <= 300 && pressTimer !== 0) {
         startShake();
+        setPressTimer(0);
         setError(true);
         setBgColor(COLORS.red);
         setTimeout(() => {
@@ -69,7 +76,6 @@ const Dash = ({
     }
 
     return () => {
-      setPressTimer(0);
       clearTimeout(timer);
       clearInterval(pressTimerInterval);
       clearInterval(interval);
@@ -113,7 +119,7 @@ const Dash = ({
       style={[
         styles.dashView,
         shakeStyle,
-        { borderColor: error ? '#ff3700' : passed ? '#49eb34' : 'transparent' }
+        { borderColor: error ? '#ff3700' : passed ? COLORS.neonGreen : 'transparent' }
       ]}
       onLayout={onDashLayout}
       onTouchStart={() => startShake()}
@@ -121,7 +127,7 @@ const Dash = ({
       <View style={{ paddingVertical: 15, backgroundColor: COLORS.green }}>
         <View
           ref={innerViewRef}
-          style={{ paddingRight: padding }}
+          style={{ paddingRight: `${padding}%` }}
           onLayout={onInnerLayout}
         />
       </View>

@@ -88,12 +88,13 @@ const Dummy2 = ({ route }) => {
       }
     };
   }, [volume]);
-
+  
+  let interval;
+  let indexChangeTimer;
   useEffect(() => {
-    setBgColor(COLORS.yellow);
     if (codeSequenceIndex !== 0) {
       setClock(timer);
-      let interval = setInterval(() => {
+      interval = setInterval(() => {
         setClock(prevClock => {
           prevClock <= 0 && clearInterval(interval);
           return prevClock - 1;
@@ -113,6 +114,9 @@ const Dummy2 = ({ route }) => {
     setPadding(10);
     setTimer(0);
     setClock(0);
+    setPressTimer(0);
+    clearTimeout(indexChangeTimer);
+    clearInterval(interval);
   };
 
   useEffect(() => {
@@ -147,7 +151,7 @@ const Dummy2 = ({ route }) => {
   //   console.log(morseCodeMap[letterPhrase[letterPhraseIndex]]);
   //   console.log(codeSequence);
   // },[codeSequence])
-  //
+
   return (
     <SafeAreaView style={styles.container}>
     <StatusBar style="dark" translucent={true}/>
@@ -195,8 +199,9 @@ const Dummy2 = ({ route }) => {
           setBgColor={setBgColor}
           pressTimer={pressTimer}
           setPressTimer={setPressTimer}
+          indexChangeTimer={indexChangeTimer}
         />
-                    <Text>{pressTimer} ms</Text></>
+                    <Text style={{ marginTop: 5 }}>{pressTimer} ms</Text></>
         }
       </View>
       <View style={styles.middleView}>

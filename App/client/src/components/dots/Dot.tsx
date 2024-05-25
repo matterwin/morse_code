@@ -32,32 +32,39 @@ const Dot = ({
   const [passed, setPassed] = useState(false);
   const [tmpBgColor, setTmpBgColor] = useState(bgColor);
 
+  const [next, setNext] = useState(true);
+
   useEffect(() => {
      let interval;
      let pressTimerInterval;
      let timer;
 
-    if (pressed && pressTimer <= 0) {
+    if (pressed && pressTimer <= 0 && !next) {
       const startTime = Date.now();
 
       const updateElapsedTime = () => { 
-        setPressTimer(Date.now() - startTime);
+        const elapsedTime = Date.now() - startTime;
+        setPressTimer(elapsedTime);
+        setPadding((elapsedTime / 100) * 100);
       }; 
 
-      pressTimerInterval = setInterval(updateElapsedTime, 10);
+      pressTimerInterval = setInterval(updateElapsedTime, 1);
 
       interval = setInterval(() => {
-        setPadding(prevPadding => prevPadding + 2);
       }, 10);
 
       timer = setTimeout(() => {
         clearInterval(pressTimerInterval);
+        setNext(true);
+        setPadding(5);
+        setPressTimer(0);
         setCodeSequenceIndex(prevCodeSequenceIndex => prevCodeSequenceIndex + 1);
       }, 100);
-
     } else {
-      if (!pressed && pressTimer < 100) {
+      setNext(false);
+      if (!pressed && pressTimer <= 300 && pressTimer !== 0) {
         startShake();
+        setPressTimer(0);
         setError(true);
         setBgColor(COLORS.red);
         setTimeout(() => {
@@ -65,11 +72,10 @@ const Dot = ({
           setBgColor(tmpBgColor);
         }, 300);
       }
-      setPadding(10);
+      setPadding(5);
     }
 
     return () => {
-      setPressTimer(0);
       clearTimeout(timer);
       clearInterval(pressTimerInterval);
       clearInterval(interval);
@@ -113,7 +119,7 @@ const Dot = ({
       style={[
         styles.dashView,
         shakeStyle,
-        { borderColor: error ? '#ff3700' : passed ? '#49eb34' : 'transparent' }
+        { borderColor: error ? '#ff3700' : passed ? COLORS.neonGreen : 'transparent' }
       ]}
       onLayout={onDashLayout}
       onTouchStart={() => startShake()}
@@ -121,7 +127,7 @@ const Dot = ({
       <View style={{ paddingVertical: 15, backgroundColor: COLORS.green }}>
         <View
           ref={innerViewRef}
-          style={{ paddingRight: padding }}
+          style={{ paddingRight: `${padding}%` }}
           onLayout={onInnerLayout}
         />
       </View>
@@ -135,11 +141,13 @@ const styles = StyleSheet.create({
   dashView: {
     paddingVertical: 0,
     width: 30,
+    borderRadius: '100%',
     backgroundColor: COLORS.grey,
     alignItems: 'flex-start',
     justifyContent: 'flex-start',
     overflow: 'hidden',
     borderColor: 'transparent',
-    borderRadius: '100%'
   },
 });
+
+
