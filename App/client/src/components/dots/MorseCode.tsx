@@ -43,6 +43,7 @@ const MorseCode = ({
         setWordSpace(true);
         setTimer(7);
         indexChangeTimer = setTimeout(() => {
+          setTimer(0);
           setCodeSequenceIndex(prev => prev+1);
           setLetterPhraseIndex(prev => prev+2);
         }, 700);
@@ -50,6 +51,7 @@ const MorseCode = ({
         setLetterSpace(true);
         setTimer(3);
         indexChangeTimer = setTimeout(() => {
+          setTimer(0);
           setCodeSequenceIndex(prev => prev+1);
           setLetterPhraseIndex(prev => prev+1);
         }, 300);
@@ -69,9 +71,9 @@ const MorseCode = ({
       }
     }
 
-    return () => {
-      clearTimeout(indexChangeTimer);
-    };
+    // return () => {
+    //   clearTimeout(indexChangeTimer);
+    // };
   },[codeSequenceIndex]);
 
   return (

@@ -13,9 +13,13 @@ import { morseCodeMap } from '../components/dots/MorseCodeMap.tsx';
 import { Audio } from 'expo-av';
 import { useNavigation } from '@react-navigation/native';
 
+const isAlphanumeric = (text) => {
+  return /^[A-Z0-9]+$/i.test(text);
+};
+
 const letterMorse = (text) => {
   if(text) {
-    if(isAlphabetical(text) === true) {
+    if(isAlphanumeric(text)) {
       const c = text.toUpperCase();
       return morseCodeMap[c];
     } else { 
@@ -23,10 +27,6 @@ const letterMorse = (text) => {
     }
   }
 };
-
-function isAlphabetical(char) {
-  return /[a-zA-Z]/.test(char);
-}
 
 const { width, height } = Dimensions.get('window');
 
@@ -92,7 +92,7 @@ const Dummy2 = ({ route }) => {
   let interval;
   let indexChangeTimer;
   useEffect(() => {
-    if (codeSequenceIndex !== 0) {
+    if (codeSequenceIndex) {
       setClock(timer);
       interval = setInterval(() => {
         setClock(prevClock => {
@@ -147,10 +147,10 @@ const Dummy2 = ({ route }) => {
     }
   };
 
-  // useEffect(() => {
-  //   console.log(morseCodeMap[letterPhrase[letterPhraseIndex]]);
-  //   console.log(codeSequence);
-  // },[codeSequence])
+  useEffect(() => {
+    console.log(morseCodeMap[letterPhrase[letterPhraseIndex]]);
+    console.log(codeSequence);
+  },[codeSequence])
 
   return (
     <SafeAreaView style={styles.container}>
