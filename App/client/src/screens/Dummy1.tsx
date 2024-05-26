@@ -1,5 +1,17 @@
 import React, { useState, useEffect } from "react";
-import { TouchableOpacity, SafeAreaView, Button, Text, View, StyleSheet, Image, Pressable, FlatList, TextInput } from "react-native";
+import { 
+  TouchableOpacity, 
+  SafeAreaView, 
+  Button, 
+  Text, 
+  View, 
+  StyleSheet,
+  Image,
+  Pressable,
+  FlatList, 
+  TextInput,
+  Alert
+} from "react-native";
 import { StatusBar } from 'expo-status-bar';
 import { useNavigation } from '@react-navigation/native';
 import { COLORS } from '../constants';
@@ -13,13 +25,18 @@ import Animated, {
   withSpring,
 } from 'react-native-reanimated';
 import AlphabetFlatList from '../components/flatlists/AlphabetFlatList.tsx';
+import { checkCharacters } from '../components/dots/MorseCodeMap.tsx';
 
 const Dummy1 = () => {
   const [userInput, setUserInput] = useState('');
   const navigation = useNavigation();
 
   const handlePress = (item) => {
-    navigation.navigate('Dummy2', { selectedItem: item });
+    if (checkCharacters(item)) {
+      navigation.navigate('Dummy2', { selectedItem: item });
+    } else {
+      Alert.alert("Illegal Character");
+    }
   };
 
   const handleSearch = () => {

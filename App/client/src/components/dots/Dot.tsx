@@ -34,9 +34,12 @@ const Dot = ({
 
   const [next, setNext] = useState(true);
 
+  let timer;
+  let pressTimerInterval;
   useEffect(() => {
-    let pressTimerInterval;
-    let timer;
+    if (!pressed && (pressTimer === 300 || pressTimer === 100)) {
+      setPressTimer(0);
+    }
 
     if (pressed && pressTimer <= 0 && !next) {
       const startTime = Date.now();
@@ -44,7 +47,7 @@ const Dot = ({
       const updateElapsedTime = () => { 
         const elapsedTime = Date.now() - startTime;
         setPressTimer(elapsedTime);
-        setPadding((elapsedTime / 100) * 102);
+        setPadding((elapsedTime / 100) * 102);  
       }; 
 
       pressTimerInterval = setInterval(updateElapsedTime, 1);
@@ -53,12 +56,12 @@ const Dot = ({
         clearInterval(pressTimerInterval);
         setNext(true);
         setPadding(10);
-        setPressTimer(0);
+        setPressTimer(100);
         setCodeSequenceIndex(prevCodeSequenceIndex => prevCodeSequenceIndex + 1);
       }, 100);
     } else {
       setNext(false);
-      if (!pressed && pressTimer <= 300 && pressTimer !== 0) {
+      if (!pressed && pressTimer < 100 && pressTimer !== 0 && pressTimer !== 100 && pressTimer !== 300) {
         startShake();
         setPressTimer(0);
         setError(true);

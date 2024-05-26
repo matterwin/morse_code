@@ -1,5 +1,18 @@
 import React, { useState, useEffect, useRef } from "react";
-import { SafeAreaView, Button, Text, View, StyleSheet, Image, TextInput, TouchableWithoutFeedback, Keyboard, Pressable, Dimensions } from "react-native";
+import { 
+  SafeAreaView, 
+  Button, 
+  Text, 
+  View, 
+  StyleSheet,
+  Image,
+  TextInput, 
+  TouchableWithoutFeedback,
+  Keyboard, 
+  Pressable, 
+  Dimensions,
+  Alert
+} from "react-native";
 import { StatusBar } from 'expo-status-bar';
 import { COLORS } from '../constants';
 import IconFoundation from 'react-native-vector-icons/Foundation';
@@ -12,21 +25,7 @@ import Dot from '../components/dots/Dot.tsx';
 import { morseCodeMap } from '../components/dots/MorseCodeMap.tsx';
 import { Audio } from 'expo-av';
 import { useNavigation } from '@react-navigation/native';
-
-const isAlphanumeric = (text) => {
-  return /^[A-Z0-9]+$/i.test(text);
-};
-
-const letterMorse = (text) => {
-  if(text) {
-    if(isAlphanumeric(text)) {
-      const c = text.toUpperCase();
-      return morseCodeMap[c];
-    } else { 
-      return null;
-    }
-  }
-};
+import { letterMorse } from '../components/dots/MorseCodeMap.tsx';
 
 const { width, height } = Dimensions.get('window');
 
@@ -59,7 +58,6 @@ const Dummy2 = ({ route }) => {
   const [pressInWhileNextSymbol, setPressInWhileNextSymbol] = useState(false);
 
   const [timer, setTimer] = useState(0);
-  const [clock, setClock] = useState(0);
 
   const [pressTimer, setPressTimer] = useState(0);
   const [pauseTimer, setPauseTimer] = useState(0);
@@ -69,7 +67,7 @@ const Dummy2 = ({ route }) => {
   useEffect(() => {
     const loadSound = async () => {
       const { sound } = await Audio.Sound.createAsync(
-        require('../../assets/beep.wav'),
+        require('../../assets/bleep.mp3'),
         { shouldPlay: false, isLooping: true }
       );
       soundRef.current = sound;
@@ -104,11 +102,12 @@ const Dummy2 = ({ route }) => {
 
       pressTimerInterval = setInterval(updateElapsedTime, 1);
 
-      setClock(timer);
       timeout = setTimeout(() => {
         clearInterval(pressTimerInterval);
         setPauseTimer(0);
-        setClock(0);
+         if (volume) {
+          soundRef.current.stopAsync();
+        }
       }, timer);
 
       return () => {
@@ -126,8 +125,8 @@ const Dummy2 = ({ route }) => {
     setBgColor(COLORS.yellow);
     setPadding(10);
     setTimer(0);
-    setClock(0);
     setPressTimer(0);
+    setPauseTimer(0);
     clearTimeout(indexChangeTimer);
     clearTimeout(timeout);
     clearInterval(pressTimerInterval);
@@ -146,19 +145,19 @@ const Dummy2 = ({ route }) => {
   };
 
   const handlePressIn = async () => {
-    setIsPressedIn(true);
-    setPressed(true);
-    if (volume && soundRef.current && !pressed) {
+    if (volume && codeSequenceIndex !== codeSequence.length) {
       await soundRef.current.playAsync();
     }
+    setIsPressedIn(true);
+    setPressed(true);
   };
 
   const handlePressOut = async () => {
+    if (volume) {
+      await soundRef.current.pauseAsync();
+    }
     setIsPressedIn(false);
     setPressed(false);
-    if (volume && soundRef.current && pressed) {
-      await soundRef.current.stopAsync();
-    }
   };
 
   // useEffect(() => {
@@ -186,7 +185,7 @@ const Dummy2 = ({ route }) => {
             <Text style={[styles.phraseText, { fontSize: fontSize }]}>{letterPhrase[letterPhraseIndex]}</Text>
           </>
         }
-        {(clock <= 0) && <><MorseCode
+        {(pauseTimer <= 0) && <><MorseCode
           phrase={letterPhrase}
           codeSequence={codeSequence}
           setCodeSequence={setCodeSequence}
@@ -205,17 +204,31 @@ const Dummy2 = ({ route }) => {
           setIsDisabled={setIsDisabled}
           timer={timer}
           setTimer={setTimer}
-          clock={clock}
           bgColor={bgColor}
           setBgColor={setBgColor}
           pressTimer={pressTimer}
           setPressTimer={setPressTimer}
           indexChangeTimer={indexChangeTimer}
+          soundRef={soundRef}
+          volume={volume}
         />
         </>
         }
-        {(clock <= 0) && 1 && <View style={styles.topRightText}><Text style={styles.timerText}>{pressTimer} ms</Text></View>}
-        {clock > 0 && 1 && <View style={styles.topRightText}><Text style={styles.timerText}>{pauseTimer} ms</Text></View>}
+        {pauseTimer <= 0 && 1 && 
+          <View style={styles.toppy}>
+            <View style={styles.topRightText}>
+              <Text style={styles.timerText}>{pressTimer} ms</Text>
+            </View>
+          </View>
+        }
+        {pauseTimer > 0 && 1 && 
+          <View style={styles.toppy}>
+            <View style={styles.topRightText}>
+              <Text style={styles.timerText}>{pauseTimer} ms</Text>
+            </View>
+            <Text>pause</Text>
+          </View>
+        }
       </View>
       <View style={styles.middleView}>
         <Pressable style={{ paddingVertical: 20, marginLeft: 20 }} onPress={() => navigation.navigate('Dummy1')}>
@@ -321,10 +334,13 @@ const styles = StyleSheet.create({
     fontSize: 45,
     color: COLORS.grey
   },
-  topRightText: {
+  toppy: {
     position: 'absolute',
     top: 10,
     right: 10,
+    alignItems: 'flex-end'
+  },
+  topRightText: {
     backgroundColor: 'rgba(255, 255, 255, 0.25)',
     padding: 5,
     borderRadius: 3,

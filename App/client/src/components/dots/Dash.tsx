@@ -37,6 +37,10 @@ const Dash = ({
   let timer;
   let pressTimerInterval;
   useEffect(() => {
+    if (!pressed && (pressTimer === 300 || pressTimer === 100)) {
+      setPressTimer(0);
+    }
+
     if (pressed && pressTimer <= 0 && !next) {
       const startTime = Date.now();
 
@@ -52,12 +56,12 @@ const Dash = ({
         clearInterval(pressTimerInterval);
         setNext(true);
         setPadding(10);
-        setPressTimer(0);
+        setPressTimer(300);
         setCodeSequenceIndex(prevCodeSequenceIndex => prevCodeSequenceIndex + 1);
       }, 300);
     } else {
       setNext(false);
-      if (!pressed && pressTimer <= 300 && pressTimer !== 0) {
+      if (!pressed && pressTimer < 300 && pressTimer !== 0 && pressTimer !== 100 && pressTimer !== 300) {
         startShake();
         setPressTimer(0);
         setError(true);

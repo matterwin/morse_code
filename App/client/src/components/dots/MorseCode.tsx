@@ -24,12 +24,13 @@ const MorseCode = ({
   setIsDisabled,
   timer,
   setTimer,
-  clock,
   bgColor,
   setBgColor,
   pressTimer,
   setPressTimer,
-  indexChangeTimer
+  indexChangeTimer,
+  soundRef,
+  volume
 }) => {
   useEffect(() => {
     generateMorseCode(phrase, setCodeSequence);
@@ -65,7 +66,10 @@ const MorseCode = ({
     } else {
       if(codeSequence.length > 0) {
         setBgColor(COLORS.lightGrey);
-        setTimer(0);
+        setPressTimer(0);
+        if (volume) {
+          soundRef.current.pauseAsync();
+        }
       }
     }
   },[codeSequenceIndex]);
@@ -78,7 +82,6 @@ const MorseCode = ({
         setPadding={setPadding}
         setCodeSequenceIndex={setCodeSequenceIndex}
         pressInWhileNextSymbol={pressInWhileNextSymbol}
-        clock={clock}
         bgColor={bgColor}
         setBgColor={setBgColor}
         pressTimer={pressTimer}
@@ -91,7 +94,6 @@ const MorseCode = ({
         setPadding={setPadding}
         setCodeSequenceIndex={setCodeSequenceIndex}
         pressInWhileNextSymbol={pressInWhileNextSymbol}
-        clock={clock}
         bgColor={bgColor}
         setBgColor={setBgColor}
         pressTimer={pressTimer}
