@@ -62,6 +62,7 @@ const Dummy2 = ({ route }) => {
   const [clock, setClock] = useState(0);
 
   const [pressTimer, setPressTimer] = useState(0);
+  const [pauseTimer, setPauseTimer] = useState(0);
 
   const soundRef = useRef(null);
 
@@ -89,19 +90,31 @@ const Dummy2 = ({ route }) => {
     };
   }, [volume]);
   
-  let interval;
+  let timeout;
   let indexChangeTimer;
+  let pressTimerInterval;
   useEffect(() => {
-    if (codeSequenceIndex) {
-      setClock(timer);
-      interval = setInterval(() => {
-        setClock(prevClock => {
-          prevClock <= 0 && clearInterval(interval);
-          return prevClock - 1;
-        })
-      }, 100);
+    if (codeSequenceIndex && codeSequenceIndex !== codeSequence.length) {
+      const startTime = Date.now();
 
-      return () => clearInterval(interval);
+      const updateElapsedTime = () => { 
+        const elapsedTime = Date.now() - startTime;
+        setPauseTimer(elapsedTime);
+      }; 
+
+      pressTimerInterval = setInterval(updateElapsedTime, 1);
+
+      setClock(timer);
+      timeout = setTimeout(() => {
+        clearInterval(pressTimerInterval);
+        setPauseTimer(0);
+        setClock(0);
+      }, timer);
+
+      return () => {
+        clearInterval(pressTimerInterval);
+        clearTimeout(timeout);
+      };
     }
   }, [timer, codeSequenceIndex]);
 
@@ -110,13 +123,14 @@ const Dummy2 = ({ route }) => {
     setLetterPhrase(route.params?.selectedItem || 'A')
     setLetterPhraseIndex(0);
     setCodeSequenceIndex(0);
-    setBgColor('#ffd35c');
+    setBgColor(COLORS.yellow);
     setPadding(10);
     setTimer(0);
     setClock(0);
     setPressTimer(0);
     clearTimeout(indexChangeTimer);
-    clearInterval(interval);
+    clearTimeout(timeout);
+    clearInterval(pressTimerInterval);
   };
 
   useEffect(() => {
@@ -147,32 +161,29 @@ const Dummy2 = ({ route }) => {
     }
   };
 
-  useEffect(() => {
-    console.log(morseCodeMap[letterPhrase[letterPhraseIndex]]);
-    console.log(codeSequence);
-  },[codeSequence])
+  // useEffect(() => {
+  //   console.log(morseCodeMap[letterPhrase[letterPhraseIndex]]);
+  //   console.log(codeSequence);
+  // },[codeSequence])
 
   return (
     <SafeAreaView style={styles.container}>
     <StatusBar style="dark" translucent={true}/>
       <View style={[styles.topView, { backgroundColor: bgColor }]}>
-        {wordSpace && !letterSpace &&
+        {wordSpace && !letterSpace && false &&
           <>
-            <Text style={styles.phraseText}>/</Text>
-            {(clock >= 1) && <Text>{clock}</Text>}
+            <Text style={styles.phraseText}>word pause</Text>
           </>
         }
-        {!wordSpace && letterSpace && 
+        {!wordSpace && letterSpace && false &&
           <>
-            <Text style={styles.phraseText}>_</Text>
-            {(clock >= 1) && <Text>{clock}</Text>}
+            <Text style={styles.phraseText}>symbol pause</Text>
           </>
         }
         {!wordSpace && !letterSpace &&
           <>
             <Text style={styles.codeText}>{letterMorse(letterPhrase[letterPhraseIndex])}</Text>
             <Text style={[styles.phraseText, { fontSize: fontSize }]}>{letterPhrase[letterPhraseIndex]}</Text>
-            {(clock >= 1) && <Text>{clock}</Text>}
           </>
         }
         {(clock <= 0) && <><MorseCode
@@ -201,13 +212,15 @@ const Dummy2 = ({ route }) => {
           setPressTimer={setPressTimer}
           indexChangeTimer={indexChangeTimer}
         />
-                    <Text style={{ marginTop: 5 }}>{pressTimer} ms</Text></>
+        </>
         }
+        {(clock <= 0) && 1 && <View style={styles.topRightText}><Text style={styles.timerText}>{pressTimer} ms</Text></View>}
+        {clock > 0 && 1 && <View style={styles.topRightText}><Text style={styles.timerText}>{pauseTimer} ms</Text></View>}
       </View>
       <View style={styles.middleView}>
         <Pressable style={{ paddingVertical: 20, marginLeft: 20 }} onPress={() => navigation.navigate('Dummy1')}>
-          <IconIon
-            name={'arrow-back'} 
+          <IconAwesome
+            name={'arrow-left'} 
             size={33} 
             color={'#ccc'} 
           />
@@ -227,7 +240,7 @@ const Dummy2 = ({ route }) => {
           />
         </Pressable>
         <Pressable style={{ paddingVertical: 20, marginRight: 20 }} onPress={() => setModalVisible(true)}>
-         <IconIon
+         <IconAwesome
             name={'search'} 
             size={34} 
             color={'#ccc'} 
@@ -275,8 +288,8 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: COLORS.yellow,
     height: '40%',
+    gap: 5,
   },
   middleView: {
     width: '100%',
@@ -298,7 +311,6 @@ const styles = StyleSheet.create({
   },
   pressed: {
     borderColor: '#fff',
-    // backgroundColor: 'rgba(255, 255, 255, 0.95)',
   },
   phraseText: {
     fontSize: '120%',
@@ -308,6 +320,17 @@ const styles = StyleSheet.create({
   codeText: {
     fontSize: 45,
     color: COLORS.grey
-  }
+  },
+  topRightText: {
+    position: 'absolute',
+    top: 10,
+    right: 10,
+    backgroundColor: 'rgba(255, 255, 255, 0.25)',
+    padding: 5,
+    borderRadius: 3,
+  },
+  timerText: {
+    fontSize: 17,
+  },
 });
 

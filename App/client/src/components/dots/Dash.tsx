@@ -34,24 +34,19 @@ const Dash = ({
 
   const [next, setNext] = useState(true);
 
+  let timer;
+  let pressTimerInterval;
   useEffect(() => {
-     let interval;
-     let pressTimerInterval;
-     let timer;
-
     if (pressed && pressTimer <= 0 && !next) {
       const startTime = Date.now();
 
       const updateElapsedTime = () => { 
         const elapsedTime = Date.now() - startTime;
         setPressTimer(elapsedTime);
-        setPadding((elapsedTime / 300) * 100);
+        setPadding((elapsedTime / 300) * 102);  
       }; 
 
       pressTimerInterval = setInterval(updateElapsedTime, 1);
-
-      interval = setInterval(() => {
-      }, 10);
 
       timer = setTimeout(() => {
         clearInterval(pressTimerInterval);
@@ -78,7 +73,6 @@ const Dash = ({
     return () => {
       clearTimeout(timer);
       clearInterval(pressTimerInterval);
-      clearInterval(interval);
     };
   }, [pressed]);
 

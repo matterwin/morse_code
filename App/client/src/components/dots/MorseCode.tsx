@@ -36,12 +36,10 @@ const MorseCode = ({
   }, [phrase]);
 
   useEffect(() => {
-    console.log(codeSequence[codeSequenceIndex] + " index # " + codeSequenceIndex);
-    console.log("-=-==-=-=-=-=-=-=-=-=-=-=-=-");
     if (codeSequenceIndex < codeSequence.length) {
       if (codeSequence[codeSequenceIndex] === '/') {
         setWordSpace(true);
-        setTimer(7);
+        setTimer(700);
         indexChangeTimer = setTimeout(() => {
           setTimer(0);
           setCodeSequenceIndex(prev => prev+1);
@@ -49,7 +47,7 @@ const MorseCode = ({
         }, 700);
       } else if(codeSequence[codeSequenceIndex] === ' ') {
         setLetterSpace(true);
-        setTimer(3);
+        setTimer(300);
         indexChangeTimer = setTimeout(() => {
           setTimer(0);
           setCodeSequenceIndex(prev => prev+1);
@@ -59,7 +57,7 @@ const MorseCode = ({
         setLetterSpace(false);
         setWordSpace(false);
         if (codeSequenceIndex-1 >= 0 && (codeSequence[codeSequenceIndex-1] !== '/' && codeSequence[codeSequenceIndex-1] !== ' ')) {
-          setTimer(1);
+          setTimer(100);
         } else {
           console.log("new letter");
         }
@@ -70,10 +68,6 @@ const MorseCode = ({
         setTimer(0);
       }
     }
-
-    // return () => {
-    //   clearTimeout(indexChangeTimer);
-    // };
   },[codeSequenceIndex]);
 
   return (

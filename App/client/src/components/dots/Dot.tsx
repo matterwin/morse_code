@@ -35,9 +35,8 @@ const Dot = ({
   const [next, setNext] = useState(true);
 
   useEffect(() => {
-     let interval;
-     let pressTimerInterval;
-     let timer;
+    let pressTimerInterval;
+    let timer;
 
     if (pressed && pressTimer <= 0 && !next) {
       const startTime = Date.now();
@@ -45,18 +44,15 @@ const Dot = ({
       const updateElapsedTime = () => { 
         const elapsedTime = Date.now() - startTime;
         setPressTimer(elapsedTime);
-        setPadding((elapsedTime / 100) * 100);
+        setPadding((elapsedTime / 100) * 102);
       }; 
 
       pressTimerInterval = setInterval(updateElapsedTime, 1);
 
-      interval = setInterval(() => {
-      }, 10);
-
       timer = setTimeout(() => {
         clearInterval(pressTimerInterval);
         setNext(true);
-        setPadding(5);
+        setPadding(10);
         setPressTimer(0);
         setCodeSequenceIndex(prevCodeSequenceIndex => prevCodeSequenceIndex + 1);
       }, 100);
@@ -72,13 +68,12 @@ const Dot = ({
           setBgColor(tmpBgColor);
         }, 300);
       }
-      setPadding(5);
+      setPadding(10);
     }
 
     return () => {
       clearTimeout(timer);
       clearInterval(pressTimerInterval);
-      clearInterval(interval);
     };
   }, [pressed]);
 
