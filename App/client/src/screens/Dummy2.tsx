@@ -32,9 +32,9 @@ const { width, height } = Dimensions.get('window');
 const Dummy2 = ({ route }) => {
   const navigation = useNavigation();
   const fontSize = width * 0.15;
-  const selectedItem  = route.params?.selectedItem || 'A'; 
+  const selectedItem  = route.params?.selectedItem.trim() || 'A'; 
 
-  const [letterPhrase, setLetterPhrase] = useState(selectedItem);
+  const [letterPhrase, setLetterPhrase] = useState('');
   const [codeSequence, setCodeSequence] = useState('');
   const [codeSequenceIndex, setCodeSequenceIndex] = useState(0);
   const [letterPhraseIndex, setLetterPhraseIndex] = useState(0);
@@ -61,6 +61,9 @@ const Dummy2 = ({ route }) => {
 
   const [pressTimer, setPressTimer] = useState(0);
   const [pauseTimer, setPauseTimer] = useState(0);
+
+  const [word, setWord] = useState([]);
+  const [wordIndex, setWordIndex] = useState(0);
 
   const soundRef = useRef(null);
 
@@ -117,9 +120,16 @@ const Dummy2 = ({ route }) => {
     }
   }, [timer, codeSequenceIndex]);
 
+  const splitter = () => {
+    const words = selectedItem.split(' ');
+    setWord(words);
+  };
+
   const resetStates = () => {
     console.log(selectedItem);
-    setLetterPhrase(route.params?.selectedItem || 'A')
+    setLetterPhrase(selectedItem || 'A');
+    splitter();
+    setWordIndex(0);
     setLetterPhraseIndex(0);
     setCodeSequenceIndex(0);
     setBgColor(COLORS.yellow);
@@ -211,6 +221,7 @@ const Dummy2 = ({ route }) => {
           indexChangeTimer={indexChangeTimer}
           soundRef={soundRef}
           volume={volume}
+          setWordIndex={setWordIndex}
         />
         </>
         }
@@ -227,6 +238,13 @@ const Dummy2 = ({ route }) => {
               <Text style={styles.timerText}>{pauseTimer} ms</Text>
             </View>
             <Text>pause</Text>
+          </View>
+        }
+        {pauseTimer <= 0 && 1 && 
+          <View style={styles.topLeftView}>
+            <View style={styles.topRightText}>
+              <Text style={styles.timerText}>{word[wordIndex]}</Text>
+            </View>
           </View>
         }
       </View>
@@ -339,6 +357,11 @@ const styles = StyleSheet.create({
     top: 10,
     right: 10,
     alignItems: 'flex-end'
+  },
+  topLeftView: {
+    position: 'absolute',
+    top: 10,
+    left: 10,
   },
   topRightText: {
     backgroundColor: 'rgba(255, 255, 255, 0.25)',

@@ -30,7 +30,8 @@ const MorseCode = ({
   setPressTimer,
   indexChangeTimer,
   soundRef,
-  volume
+  volume,
+  setWordIndex
 }) => {
   useEffect(() => {
     generateMorseCode(phrase, setCodeSequence);
@@ -45,6 +46,7 @@ const MorseCode = ({
           setTimer(0);
           setCodeSequenceIndex(prev => prev+1);
           setLetterPhraseIndex(prev => prev+2);
+          setWordIndex(prev => prev+1); 
         }, 700);
       } else if(codeSequence[codeSequenceIndex] === ' ') {
         setLetterSpace(true);
