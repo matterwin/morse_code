@@ -21,7 +21,6 @@ const MorseCode = ({
   setPadding,
   pressInWhileNextSymbol,
   setPressInWhileNextSymbol,
-  setIsDisabled,
   timer,
   setTimer,
   bgColor,

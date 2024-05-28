@@ -10,7 +10,8 @@ import {
   Pressable,
   FlatList, 
   TextInput,
-  Alert
+  Alert,
+  ScrollView
 } from "react-native";
 import { StatusBar } from 'expo-status-bar';
 import { useNavigation } from '@react-navigation/native';
@@ -25,6 +26,7 @@ import Animated, {
   withSpring,
 } from 'react-native-reanimated';
 import AlphabetFlatList from '../components/flatlists/AlphabetFlatList.tsx';
+import NumbersFlatList from '../components/flatlists/NumbersFlatList.tsx';
 import { checkCharacters } from '../components/dots/MorseCodeMap.tsx';
 
 const Dummy1 = () => {
@@ -85,7 +87,7 @@ const Dummy1 = () => {
         </View>
       </View>      
       </BlurView>
-      <AlphabetFlatList handlePress={handlePress}/> 
+      <AlphabetFlatList handlePress={handlePress} />
     </View>
   );
 };
@@ -98,7 +100,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     width: '100%',
-    backgroundColor: COLORS.grey,
+    backgroundColor: COLORS.yellow
   },
   overlay: {
     position: "absolute",

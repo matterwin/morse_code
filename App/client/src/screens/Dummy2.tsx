@@ -13,6 +13,16 @@ import {
   Dimensions,
   Alert
 } from "react-native";
+import Animated, {
+  Easing,
+  useSharedValue,
+  useAnimatedStyle,
+  useDerivedValue,
+  withSpring,
+  withRepeat,
+  withSequence,
+  withTiming
+} from 'react-native-reanimated';
 import { StatusBar } from 'expo-status-bar';
 import { COLORS } from '../constants';
 import IconFoundation from 'react-native-vector-icons/Foundation';
@@ -53,8 +63,6 @@ const Dummy2 = ({ route }) => {
 
   const [sound, setSound] = useState();
 
-  const [isDisabled, setIsDisabled] = useState(false);
-
   const [pressInWhileNextSymbol, setPressInWhileNextSymbol] = useState(false);
 
   const [timer, setTimer] = useState(0);
@@ -64,6 +72,8 @@ const Dummy2 = ({ route }) => {
 
   const [word, setWord] = useState([]);
   const [wordIndex, setWordIndex] = useState(0);
+
+  const [visible, setVisible] = useState(true);
 
   const soundRef = useRef(null);
 
@@ -155,7 +165,7 @@ const Dummy2 = ({ route }) => {
   };
 
   const handlePressIn = async () => {
-    if (volume && codeSequenceIndex !== codeSequence.length) {
+    if (volume && pauseTimer <= 0 && codeSequenceIndex !== codeSequence.length) {
       await soundRef.current.playAsync();
     }
     setIsPressedIn(true);
@@ -168,6 +178,29 @@ const Dummy2 = ({ route }) => {
     }
     setIsPressedIn(false);
     setPressed(false);
+  };
+
+  const changeVisibility = () => {
+    setVisible(prev => !prev);
+  };
+
+  const rotation = useSharedValue(0);
+
+  const rotationStyle = useAnimatedStyle(() => {
+    return {
+      transform: [
+        {
+          rotate: `${rotation.value}deg`,
+        },
+      ],
+    };
+  });
+
+  const startRotation = () => {
+    rotation.value = withTiming(rotation.value + 360, {
+      duration: 300,
+      easing: Easing.linear,
+    });
   };
 
   // useEffect(() => {
@@ -191,54 +224,55 @@ const Dummy2 = ({ route }) => {
         }
         {!wordSpace && !letterSpace &&
           <>
-            <Text style={styles.codeText}>{letterMorse(letterPhrase[letterPhraseIndex])}</Text>
+          {visible && <Text style={styles.codeText}>{letterMorse(letterPhrase[letterPhraseIndex])}</Text>}
             <Text style={[styles.phraseText, { fontSize: fontSize }]}>{letterPhrase[letterPhraseIndex]}</Text>
           </>
         }
-        {(pauseTimer <= 0) && <><MorseCode
-          phrase={letterPhrase}
-          codeSequence={codeSequence}
-          setCodeSequence={setCodeSequence}
-          codeSequenceIndex={codeSequenceIndex}
-          setCodeSequenceIndex={setCodeSequenceIndex}
-          setLetterPhraseIndex={setLetterPhraseIndex}
-          wordSpace={wordSpace}
-          setWordSpace={setWordSpace}
-          letterSpace={letterSpace}
-          setLetterSpace={setLetterSpace}
-          pressed={pressed}
-          padding={padding}
-          setPadding={setPadding}
-          pressInWhileNextSymbol={pressInWhileNextSymbol}
-          setPressInWhileNextSymbol={setPressInWhileNextSymbol}
-          setIsDisabled={setIsDisabled}
-          timer={timer}
-          setTimer={setTimer}
-          bgColor={bgColor}
-          setBgColor={setBgColor}
-          pressTimer={pressTimer}
-          setPressTimer={setPressTimer}
-          indexChangeTimer={indexChangeTimer}
-          soundRef={soundRef}
-          volume={volume}
-          setWordIndex={setWordIndex}
-        />
-        </>
+        {(!wordSpace && !letterSpace && pauseTimer === 0) && 
+          <View style={{ opacity: visible ? 1 : 0 }}>
+            <MorseCode
+              phrase={letterPhrase}
+              codeSequence={codeSequence}
+              setCodeSequence={setCodeSequence}
+              codeSequenceIndex={codeSequenceIndex}
+              setCodeSequenceIndex={setCodeSequenceIndex}
+              setLetterPhraseIndex={setLetterPhraseIndex}
+              wordSpace={wordSpace}
+              setWordSpace={setWordSpace}
+              letterSpace={letterSpace}
+              setLetterSpace={setLetterSpace}
+              pressed={pressed}
+              padding={padding}
+              setPadding={setPadding}
+              pressInWhileNextSymbol={pressInWhileNextSymbol}
+              setPressInWhileNextSymbol={setPressInWhileNextSymbol}
+              timer={timer}
+              setTimer={setTimer}
+              bgColor={bgColor}
+              setBgColor={setBgColor}
+              pressTimer={pressTimer}
+              setPressTimer={setPressTimer}
+              indexChangeTimer={indexChangeTimer}
+              soundRef={soundRef}
+              volume={volume}
+              setWordIndex={setWordIndex}
+            />
+          </View>
         }
         {pauseTimer <= 0 && 1 && 
-          <View style={styles.toppy}>
+          <Pressable onPress={() => setModalVisible(!modalVisible)} style={styles.toppy}>
             <View style={styles.topRightText}>
               <Text style={styles.timerText}>{pressTimer} ms</Text>
             </View>
-          </View>
+          </Pressable>
         }
         {pauseTimer > 0 && 1 && 
-          <View style={styles.toppy}>
+          <Pressable onPress={() => setModalVisible(!modalVisible)} style={styles.toppy}>
             <View style={styles.topRightText}>
               <Text style={styles.timerText}>{pauseTimer} ms</Text>
             </View>
             <Text>pause</Text>
-          </View>
+          </Pressable>
         }
         {pauseTimer <= 0 && 1 && 
           <View style={styles.topLeftView}>
@@ -249,34 +283,53 @@ const Dummy2 = ({ route }) => {
         }
       </View>
       <View style={styles.middleView}>
-        <Pressable style={{ paddingVertical: 20, marginLeft: 20 }} onPress={() => navigation.navigate('Dummy1')}>
-          <IconAwesome
-            name={'arrow-left'} 
-            size={33} 
-            color={'#ccc'} 
-          />
-        </Pressable>
-        <Pressable style={{ paddingVertical: 10 }} onPress={() => resetStates()}>
-          <IconFoundation 
-            name={'refresh'} 
-            size={39} 
-            color={'#ccc'} 
-          />
-        </Pressable>
-        <Pressable style={{ paddingVertical: 20 }} onPress={() => setVolume(!volume)}>
-          <IconAwesome5
-            name={volume ? 'volume-up' : 'volume-mute'} 
-            size={33} 
-            color={'#ccc'} 
-          />
-        </Pressable>
-        <Pressable style={{ paddingVertical: 20, marginRight: 20 }} onPress={() => setModalVisible(true)}>
-         <IconAwesome
-            name={'search'} 
-            size={34} 
-            color={'#ccc'} 
-          />
-        </Pressable> 
+        <View style={[styles.rowView, { marginLeft: 20, }]}>
+          <Pressable style={{ paddingVertical: 20 }} onPress={() => navigation.navigate('Dummy1')}>
+            <IconAwesome
+              name={'arrow-left'} 
+              size={33} 
+              color={'#ccc'} 
+            />
+          </Pressable>
+          <Pressable
+            style={styles.pressable}
+            onPress={() => {
+              resetStates();
+              startRotation();
+            }}
+          >
+            <Animated.View style={rotationStyle}>
+              <IconFoundation
+                name={'refresh'} 
+                size={39} 
+                color={'#ccc'} 
+              />
+            </Animated.View>
+          </Pressable>
+        </View>
+        <View style={[styles.rowView, { marginRight: 20 }]}>
+          <Pressable style={{ paddingVertical: 20 }} onPress={() => setVolume(!volume)}>
+            <IconAwesome
+              name={volume ? 'volume-up' : 'volume-off'} 
+              size={35} 
+              color={'#ccc'} 
+            />
+          </Pressable>
+          <Pressable style={{ paddingVertical: 20 }} onPress={() => setVisible(!visible)}>
+            <IconAwesome5
+              name={visible ? 'eye' : 'eye-slash'}
+              size={33} 
+              color={'#ccc'} 
+            />
+          </Pressable> 
+          <Pressable style={{ paddingVertical: 20, }} onPress={() => setModalVisible(!modalVisible)}>
+           <IconIon
+              name={'settings-sharp'}
+              size={34} 
+              color={'#ccc'} 
+            />
+          </Pressable>
+        </View>
       </View>
       <Pressable 
         style={[
@@ -324,6 +377,13 @@ const styles = StyleSheet.create({
   },
   middleView: {
     width: '100%',
+    backgroundColor: COLORS.grey,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: 15,
+  },
+  rowView: {
     backgroundColor: COLORS.grey,
     flexDirection: 'row',
     alignItems: 'center',
