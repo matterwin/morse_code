@@ -100,7 +100,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     width: '100%',
-    backgroundColor: COLORS.yellow
+    backgroundColor: COLORS.grey
   },
   overlay: {
     position: "absolute",

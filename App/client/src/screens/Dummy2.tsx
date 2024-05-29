@@ -107,6 +107,9 @@ const Dummy2 = ({ route }) => {
   useEffect(() => {
     if (codeSequenceIndex && codeSequenceIndex !== codeSequence.length) {
       const startTime = Date.now();
+      if (volume && pressed) {
+        soundRef.current.pauseAsync();
+      }
 
       const updateElapsedTime = () => { 
         const elapsedTime = Date.now() - startTime;
@@ -118,9 +121,6 @@ const Dummy2 = ({ route }) => {
       timeout = setTimeout(() => {
         clearInterval(pressTimerInterval);
         setPauseTimer(0);
-         if (volume) {
-          soundRef.current.stopAsync();
-        }
       }, timer);
 
       return () => {
@@ -137,7 +137,7 @@ const Dummy2 = ({ route }) => {
 
   const resetStates = () => {
     console.log(selectedItem);
-    setLetterPhrase(selectedItem || 'A');
+    setLetterPhrase(selectedItem);
     splitter();
     setWordIndex(0);
     setLetterPhraseIndex(0);
@@ -165,7 +165,7 @@ const Dummy2 = ({ route }) => {
   };
 
   const handlePressIn = async () => {
-    if (volume && pauseTimer <= 0 && codeSequenceIndex !== codeSequence.length) {
+    if (volume && pauseTimer === 0 && codeSequenceIndex !== codeSequence.length) {
       await soundRef.current.playAsync();
     }
     setIsPressedIn(true);
@@ -203,10 +203,10 @@ const Dummy2 = ({ route }) => {
     });
   };
 
-  // useEffect(() => {
-  //   console.log(morseCodeMap[letterPhrase[letterPhraseIndex]]);
-  //   console.log(codeSequence);
-  // },[codeSequence])
+  useEffect(() => {
+    console.log(morseCodeMap[letterPhrase[letterPhraseIndex]]);
+    console.log(codeSequence);
+  },[codeSequence])
 
   return (
     <SafeAreaView style={styles.container}>
@@ -228,7 +228,7 @@ const Dummy2 = ({ route }) => {
             <Text style={[styles.phraseText, { fontSize: fontSize }]}>{letterPhrase[letterPhraseIndex]}</Text>
           </>
         }
-        {(!wordSpace && !letterSpace && pauseTimer === 0) && 
+        {(pauseTimer === 0) && 
           <View style={{ opacity: visible ? 1 : 0 }}>
             <MorseCode
               phrase={letterPhrase}
