@@ -36,13 +36,15 @@ import { morseCodeMap } from '../components/dots/MorseCodeMap.tsx';
 import { Audio } from 'expo-av';
 import { useNavigation } from '@react-navigation/native';
 import { letterMorse } from '../components/dots/MorseCodeMap.tsx';
+import TopView from './TopView.tsx';
+import ImageSlider from '../components/extra/ImageSlider.tsx';
 
 const { width, height } = Dimensions.get('window');
 
-const Dummy2 = ({ route }) => {
+const Dummy2 = ({ route, item }) => {
   const navigation = useNavigation();
   const fontSize = width * 0.15;
-  const selectedItem  = route.params?.selectedItem.trim() || 'A'; 
+  const selectedItem  = item || route?.params?.selectedItem.trim() || 'A'; 
 
   const [letterPhrase, setLetterPhrase] = useState('');
   const [codeSequence, setCodeSequence] = useState('');
@@ -204,83 +206,48 @@ const Dummy2 = ({ route }) => {
   };
 
   useEffect(() => {
-    console.log(morseCodeMap[letterPhrase[letterPhraseIndex]]);
+    // console.log(morseCodeMap[letterPhrase[letterPhraseIndex]]);
     console.log(codeSequence);
-  },[codeSequence])
+  },[codeSequence]);
 
   return (
     <SafeAreaView style={styles.container}>
     <StatusBar style="dark" translucent={true}/>
-      <View style={[styles.topView, { backgroundColor: bgColor }]}>
-        {wordSpace && !letterSpace && false &&
-          <>
-            <Text style={styles.phraseText}>word pause</Text>
-          </>
-        }
-        {!wordSpace && letterSpace && false &&
-          <>
-            <Text style={styles.phraseText}>symbol pause</Text>
-          </>
-        }
-        {!wordSpace && !letterSpace &&
-          <>
-          {visible && <Text style={styles.codeText}>{letterMorse(letterPhrase[letterPhraseIndex])}</Text>}
-            <Text style={[styles.phraseText, { fontSize: fontSize }]}>{letterPhrase[letterPhraseIndex]}</Text>
-          </>
-        }
-        {(pauseTimer === 0) && 
-          <View style={{ opacity: visible ? 1 : 0 }}>
-            <MorseCode
-              phrase={letterPhrase}
-              codeSequence={codeSequence}
-              setCodeSequence={setCodeSequence}
-              codeSequenceIndex={codeSequenceIndex}
-              setCodeSequenceIndex={setCodeSequenceIndex}
-              setLetterPhraseIndex={setLetterPhraseIndex}
-              wordSpace={wordSpace}
-              setWordSpace={setWordSpace}
-              letterSpace={letterSpace}
-              setLetterSpace={setLetterSpace}
-              pressed={pressed}
-              padding={padding}
-              setPadding={setPadding}
-              pressInWhileNextSymbol={pressInWhileNextSymbol}
-              setPressInWhileNextSymbol={setPressInWhileNextSymbol}
-              timer={timer}
-              setTimer={setTimer}
-              bgColor={bgColor}
-              setBgColor={setBgColor}
-              pressTimer={pressTimer}
-              setPressTimer={setPressTimer}
-              indexChangeTimer={indexChangeTimer}
-              soundRef={soundRef}
-              volume={volume}
-              setWordIndex={setWordIndex}
-            />
-          </View>
-        }
-        {pauseTimer <= 0 && 1 && 
-          <Pressable onPress={() => setModalVisible(!modalVisible)} style={styles.toppy}>
-            <View style={styles.topRightText}>
-              <Text style={styles.timerText}>{pressTimer} ms</Text>
-            </View>
-          </Pressable>
-        }
-        {pauseTimer > 0 && 1 && 
-          <Pressable onPress={() => setModalVisible(!modalVisible)} style={styles.toppy}>
-            <View style={styles.topRightText}>
-              <Text style={styles.timerText}>{pauseTimer} ms</Text>
-            </View>
-            <Text>pause</Text>
-          </Pressable>
-        }
-        {pauseTimer <= 0 && 1 && 
-          <View style={styles.topLeftView}>
-            <View style={styles.topRightText}>
-              <Text style={styles.timerText}>{word[wordIndex]}</Text>
-            </View>
-          </View>
-        }
+    <View style={styles.topView} >
+      <ImageSlider
+        setWordSpace={setWordSpace}
+        setLetterSpace={setLetterSpace}
+        bgColor={bgColor}
+        letterPhrase={letterPhrase}
+        letterPhraseIndex={letterPhraseIndex}
+        wordSpace={wordSpace}
+        letterSpace={letterSpace}
+        visible={visible}
+        pauseTimer={pauseTimer}
+        codeSequence={codeSequence}
+        codeSequenceIndex={codeSequenceIndex}
+        setCodeSequence={setCodeSequence}
+        setCodeSequenceIndex={setCodeSequenceIndex}
+        setLetterPhraseIndex={setLetterPhraseIndex}
+        word={word}
+        wordIndex={wordIndex}
+        pressed={pressed}
+        padding={padding}
+        setPadding={setPadding}
+        pressInWhileNextSymbol={pressInWhileNextSymbol}
+        setPressInWhileNextSymbol={setPressInWhileNextSymbol}
+        timer={timer}
+        setTimer={setTimer}
+        setBgColor={setBgColor}
+        pressTimer={pressTimer}
+        setPressTimer={setPressTimer}
+        indexChangeTimer={indexChangeTimer}
+        soundRef={soundRef}
+        volume={volume}
+        setWordIndex={setWordIndex}
+        modalVisible={modalVisible}
+        setModalVisible={setModalVisible}
+      />
       </View>
       <View style={styles.middleView}>
         <View style={[styles.rowView, { marginLeft: 20, }]}>

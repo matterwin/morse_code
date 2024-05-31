@@ -28,6 +28,7 @@ import Animated, {
 import AlphabetFlatList from '../components/flatlists/AlphabetFlatList.tsx';
 import NumbersFlatList from '../components/flatlists/NumbersFlatList.tsx';
 import { checkCharacters } from '../components/dots/MorseCodeMap.tsx';
+import ImageSlider from '../components/extra/ImageSlider.tsx';
 
 const Dummy1 = () => {
   const [userInput, setUserInput] = useState('');
