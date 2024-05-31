@@ -47,7 +47,7 @@ const Dot = ({
       const updateElapsedTime = () => { 
         const elapsedTime = Date.now() - startTime;
         setPressTimer(elapsedTime);
-        setPadding((elapsedTime / 100) * 102);  
+        setPadding((elapsedTime / 100) * 100);  
       }; 
 
       pressTimerInterval = setInterval(updateElapsedTime, 1);

@@ -1,9 +1,11 @@
-// TopView.js
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, Pressable, StyleSheet, Dimensions } from 'react-native';
 import MorseCode from '../components/dots/MorseCode.tsx';
 import { COLORS } from '../constants';
 import { letterMorse } from '../components/dots/MorseCodeMap.tsx';
+import Dot from '../components/dots/Dot.tsx';
+import Dash from '../components/dots/Dash.tsx';
+import { morseCodeMap, generateMorseCode } from '../components/dots/MorseCodeMap.tsx';
 
 const { width, height } = Dimensions.get('window');
 
@@ -42,6 +44,48 @@ const TopView = ({
   setModalVisible,
 }) => {
   const fontSize = width * 0.15;
+  useEffect(() => {
+    generateMorseCode(letterPhrase, setCodeSequence);
+  }, [letterPhrase]);
+
+  useEffect(() => {
+    if (codeSequenceIndex < codeSequence.length) {
+      if (codeSequence[codeSequenceIndex] === '/') {
+        setWordSpace(true);
+        setTimer(700);
+        indexChangeTimer = setTimeout(() => {
+          setTimer(0);
+          setCodeSequenceIndex(prev => prev+1);
+          setLetterPhraseIndex(prev => prev+2);
+          setWordIndex(prev => prev+1); 
+        }, 700);
+      } else if(codeSequence[codeSequenceIndex] === ' ') {
+        setLetterSpace(true);
+        setTimer(300);
+        indexChangeTimer = setTimeout(() => {
+          setTimer(0);
+          setCodeSequenceIndex(prev => prev+1);
+          setLetterPhraseIndex(prev => prev+1);
+        }, 300);
+      } else {
+        setLetterSpace(false);
+        setWordSpace(false);
+        if (codeSequenceIndex-1 >= 0 && (codeSequence[codeSequenceIndex-1] !== '/' && codeSequence[codeSequenceIndex-1] !== ' ')) {
+          setTimer(100);
+        } else {
+          console.log("new letter");
+        }
+      }
+    } else {
+      if(codeSequence.length > 0) {
+        setBgColor(COLORS.lightGrey);
+        setPressTimer(0);
+        if (volume) {
+          soundRef.current.pauseAsync();
+        }
+      }
+    }
+  },[codeSequenceIndex]);
 
   return (
     <View style={[styles.topView, { backgroundColor: bgColor }]}>
@@ -63,33 +107,32 @@ const TopView = ({
         }
         {(pauseTimer === 0) && 
           <View style={{ opacity: visible ? 1 : 0 }}>
-            <MorseCode
-              phrase={letterPhrase}
-              codeSequence={codeSequence}
-              setCodeSequence={setCodeSequence}
-              codeSequenceIndex={codeSequenceIndex}
-              setCodeSequenceIndex={setCodeSequenceIndex}
-              setLetterPhraseIndex={setLetterPhraseIndex}
-              wordSpace={wordSpace}
-              setWordSpace={setWordSpace}
-              letterSpace={letterSpace}
-              setLetterSpace={setLetterSpace}
-              pressed={pressed}
-              padding={padding}
+          {codeSequence[codeSequenceIndex] === '.' ? 
+            <Dot 
+              pressed={pressed} 
+              padding={padding} 
               setPadding={setPadding}
+              setCodeSequenceIndex={setCodeSequenceIndex}
               pressInWhileNextSymbol={pressInWhileNextSymbol}
-              setPressInWhileNextSymbol={setPressInWhileNextSymbol}
-              timer={timer}
-              setTimer={setTimer}
               bgColor={bgColor}
               setBgColor={setBgColor}
               pressTimer={pressTimer}
               setPressTimer={setPressTimer}
-              indexChangeTimer={indexChangeTimer}
-              soundRef={soundRef}
-              volume={volume}
-              setWordIndex={setWordIndex}
-            />
+            /> : 
+            codeSequence[codeSequenceIndex] === '-' ? 
+            <Dash 
+              pressed={pressed} 
+              padding={padding} 
+              setPadding={setPadding}
+              setCodeSequenceIndex={setCodeSequenceIndex}
+              pressInWhileNextSymbol={pressInWhileNextSymbol}
+              bgColor={bgColor}
+              setBgColor={setBgColor}
+              pressTimer={pressTimer}
+              setPressTimer={setPressTimer}
+            /> : 
+            <></>
+          }
           </View>
         }
         {pauseTimer <= 0 && 1 && 

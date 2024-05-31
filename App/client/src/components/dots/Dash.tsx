@@ -47,7 +47,7 @@ const Dash = ({
       const updateElapsedTime = () => { 
         const elapsedTime = Date.now() - startTime;
         setPressTimer(elapsedTime);
-        setPadding((elapsedTime / 300) * 102);  
+        setPadding((elapsedTime / 300) * 100);  
       }; 
 
       pressTimerInterval = setInterval(updateElapsedTime, 1);

@@ -29,21 +29,18 @@ import IconFoundation from 'react-native-vector-icons/Foundation';
 import IconIon from 'react-native-vector-icons/Ionicons';
 import IconAwesome from 'react-native-vector-icons/FontAwesome';
 import IconAwesome5 from 'react-native-vector-icons/FontAwesome5';
-import SearchModal from '../components/modals/SearchModal.tsx';
 import MorseCode from '../components/dots/MorseCode.tsx';
 import Dot from '../components/dots/Dot.tsx';
-import { morseCodeMap } from '../components/dots/MorseCodeMap.tsx';
-import { Audio } from 'expo-av';
+import { morseCodeMap, letterMorse } from '../components/dots/MorseCodeMap.tsx';
 import { useNavigation } from '@react-navigation/native';
-import { letterMorse } from '../components/dots/MorseCodeMap.tsx';
-import TopView from './TopView.tsx';
+import { Audio } from 'expo-av';
 import ImageSlider from '../components/extra/ImageSlider.tsx';
+import SettingsBottomSheet from '../components/bottomsheets/SettingsBottomSheet.tsx';
 
 const { width, height } = Dimensions.get('window');
 
 const Dummy2 = ({ route, item }) => {
   const navigation = useNavigation();
-  const fontSize = width * 0.15;
   const selectedItem  = item || route?.params?.selectedItem.trim() || 'A'; 
 
   const [letterPhrase, setLetterPhrase] = useState('');
@@ -76,6 +73,8 @@ const Dummy2 = ({ route, item }) => {
   const [wordIndex, setWordIndex] = useState(0);
 
   const [visible, setVisible] = useState(true);
+
+  const [snapIndexForSettings, setSnapIndexForSettings] = useState(-1)
 
   const soundRef = useRef(null);
 
@@ -210,7 +209,12 @@ const Dummy2 = ({ route, item }) => {
     console.log(codeSequence);
   },[codeSequence]);
 
+  const openSettingsBottomSheet = () => {
+    setSnapIndexForSettings(snapIndexForSettings === 1 ? -1 : 0);
+  };
+
   return (
+        <SettingsBottomSheet snapIndex={snapIndexForSettings} setSnapIndex={setSnapIndexForSettings}>
     <SafeAreaView style={styles.container}>
     <StatusBar style="dark" translucent={true}/>
     <View style={styles.topView} >
@@ -289,7 +293,7 @@ const Dummy2 = ({ route, item }) => {
               color={'#ccc'} 
             />
           </Pressable> 
-          <Pressable style={{ paddingVertical: 20, }} onPress={() => setModalVisible(!modalVisible)}>
+          <Pressable style={{ paddingVertical: 20, }} onPress={openSettingsBottomSheet}>
            <IconIon
               name={'settings-sharp'}
               size={34} 
@@ -312,10 +316,8 @@ const Dummy2 = ({ route, item }) => {
           <Text style={{ color: (isPressedIn) ? 'rgba(255, 255, 255, 0)' : '#ccc', fontSize: 20 }}>TOUCH</Text>
         </View>
       </Pressable>
-      <View style={{ display: (modalVisible) ? 'visible' : 'none' }}>
-        <SearchModal modalVisible={modalVisible} setModalVisible={setModalVisible}/>
-      </View>
     </SafeAreaView>
+    </SettingsBottomSheet>
   );
 }
 

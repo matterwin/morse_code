@@ -93,19 +93,19 @@ const styles = StyleSheet.create({
     // borderRadius: 10,
   },
   text: {
-    fontSize: 24,
+    fontSize: 28,
     fontWeight: "bold",
-    color: "#fff"
+    color: COLORS.grey
   },
   listTextHeader: {
     fontSize: 24,
     fontWeight: "bold",
-    color: "white",
+    color: COLORS.lightGrey,
     marginLeft: 20,
   },
   morseCodeText: {
     fontSize: 14,
     fontWeight: "bold",
-    color: COLORS.neonGreen, 
+    color: COLORS.grey, 
   },
 });

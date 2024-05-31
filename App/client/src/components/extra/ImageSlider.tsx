@@ -6,6 +6,8 @@ import Dummy2 from '../../screens/Dummy2.tsx';
 import HelloWorld from '../../screens/TopViewSecond.tsx';
 import TopView from '../../screens/TopView.tsx';
 
+const { height, width } = Dimensions.get('window');
+
 const ImageSlider = ({
   setWordSpace,
   setLetterSpace,
@@ -40,38 +42,40 @@ const ImageSlider = ({
   modalVisible,
   setModalVisible,
 }) => {
-    const { height, width } = Dimensions.get('window');
+  const [active, setActive] = useState(0);
 
-    const [active, setActive] = useState(0);
-
-    const views = [
-    { key: '1', backgroundColor: 'red', selectedItem: 'Item 1' },
-    { key: '3', backgroundColor: 'green', selectedItem: 'HelloWorld' }, // Add HelloWorld slide
+  const views = [
+    { key: '1', selectedItem: 'SingleCode' },
+    { key: '2', selectedItem: 'HelloWorld' }, 
   ];
 
-    const onScrollChange = ({ nativeEvent }) => {
-        const slide = Math.ceil(
-          nativeEvent.contentOffset.x / nativeEvent.layoutMeasurement.width,
-        );
-        if (slide !== active) {
-            setActive(slide);
-        }
-    };
+  const onScrollChange = ({ nativeEvent }) => {
+    const slide = Math.ceil(
+      nativeEvent.contentOffset.x / nativeEvent.layoutMeasurement.width,
+    );
+    if (slide !== active) {
+      setActive(slide);
+    }
+  };
 
-    return (
-        <View>
-            <ScrollView
-                pagingEnabled
-                horizontal
-                onScroll={onScrollChange}
-                showsHorizontalScrollIndicator={false}
-                style={{ width, height }}>
-                {views.map((view) => (
-          <View
-            key={view.key}
-            style={[{ width }]}>
-            {view.selectedItem === 'HelloWorld' ? <HelloWorld codeSequence={codeSequence} letterPhrase={letterPhrase}/> :       
-              <TopView
+  return (
+    <View>
+      <ScrollView
+        pagingEnabled
+        horizontal
+        onScroll={onScrollChange}
+        showsHorizontalScrollIndicator={false}
+        style={{ width, height }}
+      >
+      {views.map((view) => (
+        <View
+          key={view.key}
+          style={[{ width }]}
+        >
+          {view.selectedItem === 'HelloWorld' ? 
+            <HelloWorld codeSequence={codeSequence} letterPhrase={letterPhrase} bgColor={bgColor} /> 
+              :       
+            <TopView
               setWordSpace={setWordSpace}
               setLetterSpace={setLetterSpace}
               bgColor={bgColor}
@@ -105,45 +109,44 @@ const ImageSlider = ({
               modalVisible={modalVisible}
               setModalVisible={setModalVisible}
             />
- }
-          </View>
-        ))}
-            </ScrollView>
-            <View style={styles.pagination}>
-                {views.map((_, index) => (
-                    <Text key={index} style={index === active ? styles.activeDot : styles.dot}>
-                        •
-                    </Text>
-                ))}
-            </View>
+          }
         </View>
-    );
+      ))}
+      </ScrollView>
+        <View style={styles.pagination}>
+          {views.map((_, index) => (
+            <Text key={index} style={index === active ? styles.activeDot : styles.dot}>•</Text>
+          ))}
+        </View>
+    </View>
+  );
 }
 
+export default ImageSlider;
+
 const styles = StyleSheet.create({
-    viewContainer: {
-        justifyContent: 'center',
-        alignItems: 'center',
-    },
-    viewText: {
-        fontSize: 20,
-        color: '#fff',
-    },
-    pagination: {
-        flexDirection: 'row',
-        position: 'absolute',
-        bottom: -15,
-        alignSelf: 'center',
-    },
-    dot: {
-        color: '#888',
-        fontSize: 50,
-    },
-    activeDot: {
-        color: '#FFF',
-        fontSize: 50,
-    },
+  viewContainer: {
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  viewText: {
+    fontSize: 20,
+    color: '#fff',
+  },
+  pagination: {
+    flexDirection: 'row',
+    position: 'absolute',
+    bottom: 0,
+    alignSelf: 'center',
+  },
+  dot: {
+    color: '#888',
+    fontSize: 30,
+  },
+  activeDot: {
+    color: '#FFF',
+    fontSize: 30,
+  },
 });
 
-export default ImageSlider;
 
