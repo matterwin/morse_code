@@ -17,7 +17,12 @@ const SearchModal = ({ modalVisible, setModalVisible }) => {
               <Pressable
                 style={[styles.button, styles.buttonClose]}
                 onPress={() => setModalVisible(false)}>
-                <Text style={styles.textStyle}>Hide Modal</Text>
+                <Text style={styles.textStyle}>Reset to 12 wpm</Text>
+              </Pressable>
+              <Pressable
+                style={[styles.button, styles.buttonClose]}
+                onPress={() => setModalVisible(false)}>
+                <Text style={styles.textStyle}>Cancel</Text>
               </Pressable>
             </View>
           </View>
@@ -34,13 +39,17 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+    bottom: 0,
+    height: '100%'
   },
   modalView: {
     width: Dimensions.get('window').width, 
-    height: Dimensions.get('window').height,
+    // height: Dimensions.get('window').height,
     // backgroundColor: COLORS.grey,
     marginTop: 150,
     padding: 15,
+    gap: 15,
+    bottom: 0,
   },
   button: {
     borderRadius: 20,

@@ -23,32 +23,19 @@ import BottomSheet, {
 import { COLORS } from '../../constants/index.tsx';
 import Icon from 'react-native-vector-icons/Ionicons';
 import IconAwesome from 'react-native-vector-icons/FontAwesome';
-import Slider from '@react-native-community/slider';
 
 type Props = {
   children: JSX.Element | JSX.Element[];
 }
 
-const SettingsBottomSheet = ({ 
-  children, 
-  snapIndex, 
-  setSnapIndex, 
-  wpm, 
-  setWpm, 
-  setSnapIndexForConfirmation,
-  bottomSheetRef,
-  setModalVisible,
-  timeunit,
-  setTimeunit
-}: Props & { snapIndex: number }) => {
-  const [tmpWpm, setTmpWpm] = useState(wpm);
-  const [tmpTimeunit, setTmpTimeunit] = useState(timeunit);
+const ConfirmationBottomSheet = ({ children, snapIndex, setSnapIndex, setSnapIndexForSettings, bottomSheetRefForSettings }: Props & { snapIndex: number }) => {
+  const bottomSheetRef = useRef<BottomSheet>(null);
 
   const calcWpm = (value) => {
-    setTmpWpm(value);
+    setWpm(value);
   };
 
-  const snapPoints = useMemo(() => ['60%'], []);
+  const snapPoints = useMemo(() => ['25%'], []);
 
   const handleSheetChanges = useCallback((index: number) => {
     setSnapIndex(index);
@@ -57,6 +44,19 @@ const SettingsBottomSheet = ({
   const animationConfigs = useBottomSheetTimingConfigs({
     duration: 400,
   });
+
+  const handleUpdate = () => {
+    setModalVisible(true);
+  };
+
+  const confirmReset = () => {
+    bottomSheetRef.current.close();
+    bottomSheetRefForSettings.current.close();
+  };
+
+  const cancelReset = () => {
+    bottomSheetRef.current.close();
+  };
 
   const renderBackdrop = useCallback(
 		(props) => (
@@ -71,18 +71,6 @@ const SettingsBottomSheet = ({
 		[]
 	);
 
-  useEffect(() => {
-    const timePerUnit = (60 / (tmpWpm * 50)) * 1000;
-    const tu = Math.round(timePerUnit);
-    setTmpTimeunit(tu);
-  }, [tmpWpm]);
-
-   const handleUpdate = () => {
-    setTimeunit(tmpTimeunit);
-    setWpm(tmpWpm);
-    bottomSheetRef.current.close();
-  };
-
   return (
     <View style={styles.container}>
       {children} 
@@ -93,7 +81,7 @@ const SettingsBottomSheet = ({
         enablePanDownToClose
         onChange={handleSheetChanges}
         handleStyle={{ backgroundColor: 'transparent' }}
-        handleIndicatorStyle={{ backgroundColor: '#fff', width: 50, height: 5 }}
+        handleIndicatorStyle={{ backgroundColor: '#fff', width: 50, height: 0 }}
         backgroundStyle={{  backgroundColor: 'transparent' }} 
         backdropComponent={renderBackdrop}
         animationConfigs={animationConfigs}
@@ -101,49 +89,27 @@ const SettingsBottomSheet = ({
         <View style={styles.sheetContainer}>
           <View style={styles.titleView}>
             <View style={{ margin: 10, marginLeft: 10 }}>
-              <Text style={styles.titleText}>Settings</Text>
+              <Text style={styles.titleText}>Confirmation to reset to default</Text>
             </View>
-            <TouchableOpacity style={{ margin: 10, marginRight: 10 }} onPress={handleUpdate}>
+            <TouchableOpacity style={{ margin: 10, marginRight: 10 }} onPress={() => bottomSheetRef.current.close()}>
               <IconAwesome name="close" size={33} color={"#ccc"}/>
             </TouchableOpacity>
           </View>
-          <BottomSheetScrollView style={{flex:1}}>
-            <View style={styles.buttonRow}>
-              <Pressable style={styles.button} onPress={() => setSnapIndexForConfirmation(0)}>
-                <Text style={{ fontSize: 17, color: COLORS.white, fontWeight: 600 }}>Reset</Text>
-              </Pressable>
-              <Pressable style={[styles.button, { backgroundColor: COLORS.greyLighter }]}>
-                <Text style={{ fontSize: 17, color: COLORS.white, fontWeight: 600 }}>WMP: {tmpWpm}</Text>
-              </Pressable>
-            </View>
-            <View style={styles.middleView}>
-              <View style={styles.sliderView}>
-                <Slider
-                  style={{ height: 40, width: '100%', marginLeft: 10, marginRight: 10 }}
-                  minimumValue={5}
-                  maximumValue={35}
-                  minimumTrackTintColor={COLORS.yellow}
-                  maximumTrackTintColor={COLORS.lightGrey}
-                  onValueChange={(value) => calcWpm(value)}
-                  step={1}
-                  value={wpm}
-                />
-              </View>
-              <View style={{ backgroundColor: COLORS.greyLighter, padding: 10, borderRadius: 10, width: '100%'}}>
-                <Text style={[styles.regText, { marginBottom: 10 }]}>1 time unit is ~{tmpTimeunit} ms</Text>
-                <Text style={styles.regText}>Intra-character Pause: {tmpTimeunit} ms </Text>
-                <Text style={styles.regText}>Inter-character Pause: {tmpTimeunit * 3} ms </Text>
-                <Text style={styles.regText}>Word Pause: {tmpTimeunit * 7} ms </Text>
-              </View>
-            </View>
-          </BottomSheetScrollView>
+          <View style={styles.middleView}>
+            <Pressable style={styles.button} onPress={confirmReset}>
+              <Text style={{ fontSize: 17, color: COLORS.white, fontWeight: 600 }}>Reset</Text>
+            </Pressable>
+            <Pressable style={[styles.button, { backgroundColor: COLORS.greyLighter }]} onPress={cancelReset}>
+              <Text style={{ fontSize: 17, color: COLORS.white, fontWeight: 600 }}>Cancel</Text>
+            </Pressable>
+          </View>
         </View>
       </BottomSheet>
     </View>
   );
 };
 
-export default SettingsBottomSheet;
+export default ConfirmationBottomSheet;
 
 const styles = StyleSheet.create({
   container: {
@@ -161,7 +127,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     // borderBottomWidth: 1,
-    borderColor: COLORS.greyLighter,
+    // borderColor: COLORS.greyLighter,
     flexDirection: 'row',
   },
   titleLocationView: {
@@ -180,7 +146,8 @@ const styles = StyleSheet.create({
     color: COLORS.white,
     fontWeight: '700',
     fontSize: 18,
-    textAlign: 'center'
+    textAlign: 'center',
+
   },
   titleLocationText: {
     color: COLORS.white,
@@ -223,29 +190,22 @@ const styles = StyleSheet.create({
     fontSize: 21,
     color: COLORS.white
   },
-  locationAndAddressView: {
-    flexDirection: 'column',
-    alignItems: 'flex-start',
-    justifyContent: 'flex-start',
-    width: '90%',
-  },
   button: {
     borderRadius: 20,
     backgroundColor: COLORS.lightGrey,
     backgroundColor: COLORS.red,
     padding: 10,
-    borderRadius: 3,
-  },
-  buttonRow: {
-    flexDirection: 'row',
-    marginHorizontal: 10,
-    gap: 10
+    borderRadius: 10,
+    width: '100%',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   middleView: {
     width: '100%',
-    alignItems: 'flex-start',
+    alignItems: 'center',
     justifyContent: 'center',
     paddingHorizontal: 10,
+    gap: 10
   },
   regText: {
     color: COLORS.white,
@@ -257,6 +217,7 @@ const styles = StyleSheet.create({
     width: '100%'
   },
 });
+
 
 
 

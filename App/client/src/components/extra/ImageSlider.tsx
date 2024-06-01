@@ -1,10 +1,16 @@
 import React, { useState } from 'react';
 import {
-    View, StyleSheet, ScrollView, Dimensions, Text
+  View, 
+  StyleSheet, 
+  ScrollView, 
+  Dimensions, 
+  Text,
+  Pressable
 } from 'react-native';
 import Dummy2 from '../../screens/Dummy2.tsx';
 import HelloWorld from '../../screens/TopViewSecond.tsx';
 import TopView from '../../screens/TopView.tsx';
+import { COLORS } from '../../constants';
 
 const { height, width } = Dimensions.get('window');
 
@@ -41,6 +47,7 @@ const ImageSlider = ({
   setWordIndex,
   modalVisible,
   setModalVisible,
+  timeunit
 }) => {
   const [active, setActive] = useState(0);
 
@@ -108,16 +115,17 @@ const ImageSlider = ({
               setWordIndex={setWordIndex}
               modalVisible={modalVisible}
               setModalVisible={setModalVisible}
+              timeunit={timeunit}
             />
           }
         </View>
       ))}
       </ScrollView>
-        <View style={styles.pagination}>
-          {views.map((_, index) => (
-            <Text key={index} style={index === active ? styles.activeDot : styles.dot}>•</Text>
-          ))}
-        </View>
+      <View style={styles.pagination}>
+        {views.map((_, index) => (
+          <Text key={index} style={index === active ? styles.activeDot : styles.dot}>•</Text>
+        ))}
+      </View>
     </View>
   );
 }
@@ -147,6 +155,49 @@ const styles = StyleSheet.create({
     color: '#FFF',
     fontSize: 30,
   },
+  topView: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    height: '100%',
+    gap: 5,
+  },
+  phraseText: {
+    fontSize: '120%',
+    fontWeight: '600',
+    color: COLORS.grey,
+  },
+  codeText: {
+    fontSize: 45,
+    color: COLORS.grey,
+  },
+  toppy: {
+    position: 'absolute',
+    top: 10,
+    right: 10,
+    alignItems: 'flex-end',
+    flex: 1,
+  },
+  topLeftView: {
+    position: 'absolute',
+    top: 10,
+    left: 10,
+  },
+  topRightText: {
+    backgroundColor: 'rgba(255, 255, 255, 0.25)',
+    padding: 5,
+    borderRadius: 3,
+  },
+  timerText: {
+    fontSize: 17,
+  },
+  vieww: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    gap: 5,
+    width: ''
+  }
 });
 
 

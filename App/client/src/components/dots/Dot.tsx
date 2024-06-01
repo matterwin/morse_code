@@ -21,7 +21,8 @@ const Dot = ({
   bgColor, 
   setBgColor,
   pressTimer, 
-  setPressTimer 
+  setPressTimer,
+  timeunit
 }) => {
   const shake = useSharedValue(0);
   const innerViewRef = useRef(null);
@@ -34,10 +35,12 @@ const Dot = ({
 
   const [next, setNext] = useState(true);
 
+  const dashTu = timeunit * 3;
+
   let timer;
   let pressTimerInterval;
   useEffect(() => {
-    if (!pressed && (pressTimer === 300 || pressTimer === 100)) {
+    if (!pressed && (pressTimer === dashTu || pressTimer === timeunit)) {
       setPressTimer(0);
     }
 
@@ -47,7 +50,7 @@ const Dot = ({
       const updateElapsedTime = () => { 
         const elapsedTime = Date.now() - startTime;
         setPressTimer(elapsedTime);
-        setPadding((elapsedTime / 100) * 100);  
+        setPadding((elapsedTime / timeunit) * 100);  
       }; 
 
       pressTimerInterval = setInterval(updateElapsedTime, 1);
@@ -56,12 +59,12 @@ const Dot = ({
         clearInterval(pressTimerInterval);
         setNext(true);
         setPadding(10);
-        setPressTimer(100);
+        setPressTimer(timeunit);
         setCodeSequenceIndex(prevCodeSequenceIndex => prevCodeSequenceIndex + 1);
-      }, 100);
+      }, timeunit);
     } else {
       setNext(false);
-      if (!pressed && pressTimer < 100 && pressTimer !== 0 && pressTimer !== 100 && pressTimer !== 300) {
+      if (!pressed && pressTimer < timeunit && pressTimer !== 0 && pressTimer !== timeunit && pressTimer !== dashTu)  {
         startShake();
         setPressTimer(0);
         setError(true);

@@ -36,6 +36,8 @@ import { useNavigation } from '@react-navigation/native';
 import { Audio } from 'expo-av';
 import ImageSlider from '../components/extra/ImageSlider.tsx';
 import SettingsBottomSheet from '../components/bottomsheets/SettingsBottomSheet.tsx';
+import ConfirmationBottomSheet from '../components/bottomsheets/ConfirmationBottomSheet.tsx';
+import AlertModal from '../components/modals/AlertModal.tsx';
 
 const { width, height } = Dimensions.get('window');
 
@@ -74,7 +76,11 @@ const Dummy2 = ({ route, item }) => {
 
   const [visible, setVisible] = useState(true);
 
-  const [snapIndexForSettings, setSnapIndexForSettings] = useState(-1)
+  const [snapIndexForSettings, setSnapIndexForSettings] = useState(-1);
+  const [snapIndexForConfirmation, setSnapIndexForConfirmation] = useState(-1);
+
+  const [wpm, setWpm] = useState(12);
+  const [timeunit, setTimeunit] = useState(100);
 
   const soundRef = useRef(null);
 
@@ -204,120 +210,173 @@ const Dummy2 = ({ route, item }) => {
     });
   };
 
-  useEffect(() => {
-    // console.log(morseCodeMap[letterPhrase[letterPhraseIndex]]);
-    console.log(codeSequence);
-  },[codeSequence]);
+  // useEffect(() => {
+  //   // console.log(morseCodeMap[letterPhrase[letterPhraseIndex]]);
+  //   console.log(codeSequence);
+  // },[codeSequence]);
+  
+  const bottomSheetRefForSettings = useRef<BottomSheet>(null);
 
   const openSettingsBottomSheet = () => {
-    setSnapIndexForSettings(snapIndexForSettings === 1 ? -1 : 0);
+    setModalVisible(true);
+    setSnapIndexForSettings(0);
   };
 
   return (
-        <SettingsBottomSheet snapIndex={snapIndexForSettings} setSnapIndex={setSnapIndexForSettings}>
-    <SafeAreaView style={styles.container}>
-    <StatusBar style="dark" translucent={true}/>
-    <View style={styles.topView} >
-      <ImageSlider
-        setWordSpace={setWordSpace}
-        setLetterSpace={setLetterSpace}
-        bgColor={bgColor}
-        letterPhrase={letterPhrase}
-        letterPhraseIndex={letterPhraseIndex}
-        wordSpace={wordSpace}
-        letterSpace={letterSpace}
-        visible={visible}
-        pauseTimer={pauseTimer}
-        codeSequence={codeSequence}
-        codeSequenceIndex={codeSequenceIndex}
-        setCodeSequence={setCodeSequence}
-        setCodeSequenceIndex={setCodeSequenceIndex}
-        setLetterPhraseIndex={setLetterPhraseIndex}
-        word={word}
-        wordIndex={wordIndex}
-        pressed={pressed}
-        padding={padding}
-        setPadding={setPadding}
-        pressInWhileNextSymbol={pressInWhileNextSymbol}
-        setPressInWhileNextSymbol={setPressInWhileNextSymbol}
-        timer={timer}
-        setTimer={setTimer}
-        setBgColor={setBgColor}
-        pressTimer={pressTimer}
-        setPressTimer={setPressTimer}
-        indexChangeTimer={indexChangeTimer}
-        soundRef={soundRef}
-        volume={volume}
-        setWordIndex={setWordIndex}
-        modalVisible={modalVisible}
+    <ConfirmationBottomSheet 
+      snapIndex={snapIndexForConfirmation}
+      setSnapIndex={setSnapIndexForConfirmation}
+      setSnapIndexForSettings={setSnapIndexForSettings}
+      bottomSheetRefForSettings={bottomSheetRefForSettings}
+      setTimeunit={setTimeunit}
+    >
+      <SettingsBottomSheet 
+        snapIndex={snapIndexForSettings}
+        setSnapIndex={setSnapIndexForSettings}
+        wpm={wpm}
+        setWpm={setWpm} 
         setModalVisible={setModalVisible}
-      />
-      </View>
-      <View style={styles.middleView}>
-        <View style={[styles.rowView, { marginLeft: 20, }]}>
-          <Pressable style={{ paddingVertical: 20 }} onPress={() => navigation.navigate('Dummy1')}>
-            <IconAwesome
-              name={'arrow-left'} 
-              size={33} 
-              color={'#ccc'} 
-            />
-          </Pressable>
-          <Pressable
-            style={styles.pressable}
-            onPress={() => {
-              resetStates();
-              startRotation();
-            }}
-          >
-            <Animated.View style={rotationStyle}>
-              <IconFoundation
-                name={'refresh'} 
-                size={39} 
-                color={'#ccc'} 
-              />
-            </Animated.View>
-          </Pressable>
-        </View>
-        <View style={[styles.rowView, { marginRight: 20 }]}>
-          <Pressable style={{ paddingVertical: 20 }} onPress={() => setVolume(!volume)}>
-            <IconAwesome
-              name={volume ? 'volume-up' : 'volume-off'} 
-              size={35} 
-              color={'#ccc'} 
-            />
-          </Pressable>
-          <Pressable style={{ paddingVertical: 20 }} onPress={() => setVisible(!visible)}>
-            <IconAwesome5
-              name={visible ? 'eye' : 'eye-slash'}
-              size={33} 
-              color={'#ccc'} 
-            />
-          </Pressable> 
-          <Pressable style={{ paddingVertical: 20, }} onPress={openSettingsBottomSheet}>
-           <IconIon
-              name={'settings-sharp'}
-              size={34} 
-              color={'#ccc'} 
-            />
-          </Pressable>
-        </View>
-      </View>
-      <Pressable 
-        style={[
-          styles.bottomView, 
-          isPressed && styles.pressed, 
-          isPressedIn && { backgroundColor: 'rgba(255, 255, 255, 0.35)' }
-        ]}
-        onPress={handlePress}
-        onPressIn={handlePressIn}
-        onPressOut={handlePressOut}
+        setSnapIndexForConfirmation={setSnapIndexForConfirmation}
+        bottomSheetRef={bottomSheetRefForSettings}
+        setModalVisible={setModalVisible}
+        timeunit={timeunit}
+        setTimeunit={setTimeunit}
       >
-        <View>
-          <Text style={{ color: (isPressedIn) ? 'rgba(255, 255, 255, 0)' : '#ccc', fontSize: 20 }}>TOUCH</Text>
-        </View>
-      </Pressable>
-    </SafeAreaView>
-    </SettingsBottomSheet>
+        <SafeAreaView style={styles.container}>
+        <StatusBar style="dark" translucent={true}/>
+        <View style={styles.topView}>
+          <View style={{ zIndex: 1, width: '100%'}}>
+            {pauseTimer <= 0 && 1 && 
+              <Pressable onPress={openSettingsBottomSheet} style={styles.toppy}>
+                <View style={styles.topRightText}>
+                  <Text style={styles.timerText}>{pressTimer} ms</Text>
+                </View>
+              </Pressable>
+            }
+            {pauseTimer > 0 && 1 && 
+              <Pressable onPress={openSettingsBottomSheet} style={styles.toppy}>
+                <View style={styles.topRightText}>
+                  <Text style={styles.timerText}>{pauseTimer} ms</Text>
+                </View>
+                <Text>pause</Text>
+              </Pressable>
+            }
+            {pauseTimer <= 0 && 1 && 
+              <View style={styles.topLeftView}>
+                <View style={styles.topRightText}>
+                  <Text style={styles.timerText}>{word[wordIndex]}</Text>
+                </View>
+              </View>
+            }
+            </View>
+            <View>
+          <ImageSlider
+            setWordSpace={setWordSpace}
+            setLetterSpace={setLetterSpace}
+            bgColor={bgColor}
+            letterPhrase={letterPhrase}
+            letterPhraseIndex={letterPhraseIndex}
+            wordSpace={wordSpace}
+            letterSpace={letterSpace}
+            visible={visible}
+            pauseTimer={pauseTimer}
+            codeSequence={codeSequence}
+            codeSequenceIndex={codeSequenceIndex}
+            setCodeSequence={setCodeSequence}
+            setCodeSequenceIndex={setCodeSequenceIndex}
+            setLetterPhraseIndex={setLetterPhraseIndex}
+            word={word}
+            wordIndex={wordIndex}
+            pressed={pressed}
+            padding={padding}
+            setPadding={setPadding}
+            pressInWhileNextSymbol={pressInWhileNextSymbol}
+            setPressInWhileNextSymbol={setPressInWhileNextSymbol}
+            timer={timer}
+            setTimer={setTimer}
+            setBgColor={setBgColor}
+            pressTimer={pressTimer}
+            setPressTimer={setPressTimer}
+            indexChangeTimer={indexChangeTimer}
+            soundRef={soundRef}
+            volume={volume}
+            setWordIndex={setWordIndex}
+            modalVisible={modalVisible}
+            setModalVisible={setModalVisible}
+            wpm={wpm}
+            timeunit={timeunit}
+          />
+          </View>
+          </View>
+          <View style={styles.middleView}>
+            <View style={[styles.rowView, { marginLeft: 20, }]}>
+              <Pressable style={{ paddingVertical: 20 }} onPress={() => navigation.navigate('Dummy1')}>
+                <IconAwesome
+                  name={'arrow-left'} 
+                  size={33} 
+                  color={'#ccc'} 
+                />
+              </Pressable>
+              <Pressable
+                style={styles.pressable}
+                onPress={() => {
+                  resetStates();
+                  startRotation();
+                }}
+              >
+                <Animated.View style={rotationStyle}>
+                  <IconFoundation
+                    name={'refresh'} 
+                    size={39} 
+                    color={'#ccc'} 
+                  />
+                </Animated.View>
+              </Pressable>
+            </View>
+            <View style={[styles.rowView, { marginRight: 20 }]}>
+              <Pressable style={{ paddingVertical: 20 }} onPress={() => setVolume(!volume)}>
+                <IconAwesome
+                  name={volume ? 'volume-up' : 'volume-off'} 
+                  size={35} 
+                  color={'#ccc'} 
+                />
+              </Pressable>
+              <Pressable style={{ paddingVertical: 20 }} onPress={() => setVisible(!visible)}>
+                <IconAwesome5
+                  name={visible ? 'eye' : 'eye-slash'}
+                  size={33} 
+                  color={'#ccc'} 
+                />
+              </Pressable> 
+              <Pressable style={{ paddingVertical: 20, }} onPress={openSettingsBottomSheet}>
+               <IconIon
+                  name={'settings-sharp'}
+                  size={34} 
+                  color={'#ccc'} 
+                />
+              </Pressable>
+            </View>
+          </View>
+          <Pressable 
+            style={[
+              styles.bottomView, 
+              isPressed && styles.pressed, 
+              isPressedIn && { backgroundColor: 'rgba(255, 255, 255, 0.35)' }
+            ]}
+            onPress={handlePress}
+            onPressIn={handlePressIn}
+            onPressOut={handlePressOut}
+          >
+            <View>
+              <Text style={{ color: (isPressedIn) ? 'rgba(255, 255, 255, 0)' : '#ccc', fontSize: 20 }}>TOUCH</Text>
+            </View>
+          </Pressable>
+          <View style={{ display: (modalVisible) ? 'visible' : 'none' }}>
+            <AlertModal modalVisible={modalVisible} setModalVisible={setModalVisible} wpm={wpm}/>
+          </View>
+        </SafeAreaView>
+      </SettingsBottomSheet>
+    </ConfirmationBottomSheet>
   );
 }
 

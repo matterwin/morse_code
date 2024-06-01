@@ -42,8 +42,12 @@ const TopView = ({
   setWordIndex,
   modalVisible,
   setModalVisible,
+  timeunit
 }) => {
   const fontSize = width * 0.15;
+  const interCharPause = timeunit * 3;
+  const wordPause = timeunit * 7;
+
   useEffect(() => {
     generateMorseCode(letterPhrase, setCodeSequence);
   }, [letterPhrase]);
@@ -52,26 +56,26 @@ const TopView = ({
     if (codeSequenceIndex < codeSequence.length) {
       if (codeSequence[codeSequenceIndex] === '/') {
         setWordSpace(true);
-        setTimer(700);
+        setTimer(wordPause);
         indexChangeTimer = setTimeout(() => {
           setTimer(0);
           setCodeSequenceIndex(prev => prev+1);
           setLetterPhraseIndex(prev => prev+2);
           setWordIndex(prev => prev+1); 
-        }, 700);
+        }, wordPause);
       } else if(codeSequence[codeSequenceIndex] === ' ') {
         setLetterSpace(true);
-        setTimer(300);
+        setTimer(interCharPause);
         indexChangeTimer = setTimeout(() => {
           setTimer(0);
           setCodeSequenceIndex(prev => prev+1);
           setLetterPhraseIndex(prev => prev+1);
-        }, 300);
+        }, interCharPause);
       } else {
         setLetterSpace(false);
         setWordSpace(false);
         if (codeSequenceIndex-1 >= 0 && (codeSequence[codeSequenceIndex-1] !== '/' && codeSequence[codeSequenceIndex-1] !== ' ')) {
-          setTimer(100);
+          setTimer(timeunit);
         } else {
           console.log("new letter");
         }
@@ -88,7 +92,7 @@ const TopView = ({
   },[codeSequenceIndex]);
 
   return (
-    <View style={[styles.topView, { backgroundColor: bgColor }]}>
+    <View style={[styles.topView, { backgroundColor: bgColor, paddingBottom: visible ? 0 : 0 }]}>
         {wordSpace && !letterSpace && false &&
           <>
             <Text style={styles.phraseText}>word pause</Text>
@@ -118,6 +122,7 @@ const TopView = ({
               setBgColor={setBgColor}
               pressTimer={pressTimer}
               setPressTimer={setPressTimer}
+              timeunit={timeunit}
             /> : 
             codeSequence[codeSequenceIndex] === '-' ? 
             <Dash 
@@ -130,31 +135,10 @@ const TopView = ({
               setBgColor={setBgColor}
               pressTimer={pressTimer}
               setPressTimer={setPressTimer}
+              timeunit={timeunit}
             /> : 
             <></>
           }
-          </View>
-        }
-        {pauseTimer <= 0 && 1 && 
-          <Pressable onPress={() => setModalVisible(!modalVisible)} style={styles.toppy}>
-            <View style={styles.topRightText}>
-              <Text style={styles.timerText}>{pressTimer} ms</Text>
-            </View>
-          </Pressable>
-        }
-        {pauseTimer > 0 && 1 && 
-          <Pressable onPress={() => setModalVisible(!modalVisible)} style={styles.toppy}>
-            <View style={styles.topRightText}>
-              <Text style={styles.timerText}>{pauseTimer} ms</Text>
-            </View>
-            <Text>pause</Text>
-          </Pressable>
-        }
-        {pauseTimer <= 0 && 1 && 
-          <View style={styles.topLeftView}>
-            <View style={styles.topRightText}>
-              <Text style={styles.timerText}>{word[wordIndex]}</Text>
-            </View>
           </View>
         }
       </View>
