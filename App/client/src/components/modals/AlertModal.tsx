@@ -20,43 +20,36 @@ const AlertModal = ({ modalVisible, setModalVisible, wpm, timeoutDuration = 3000
   }, [modalVisible, timeoutDuration]);
 
   return (
-    <View style={styles.centeredView}>
       <Modal
         isVisible={modalVisible}
-        onBackdropPress={() => setModalVisible(false)}
-        backdropOpacity={0}
-        animationIn="slideInDown"
-        animationOut="slideOutUp"
+        backdropOpacity={1}
+        animationIn="zoomIn"
+        animationOut="fadeOut"
         backdropTransitionOutTiming={0}
         useNativeDriver={true}
         style={styles.modal}
         hasBackdrop={true}
       >
         <View style={styles.modalView}>
+          <View style={styles.middleView}>
           <Text style={styles.modalText}>Wpm {wpm}</Text>
+          </View>
         </View>
       </Modal>
-    </View>
   );
 };
 
 export default AlertModal;
 
 const styles = StyleSheet.create({
-  centeredView: {
-    flex: 1,
-  },
    modal: {
     justifyContent: 'flex-start',
     margin: 0,
     top: '10%',
-    backgroundColor: 'red',
   },
   modalView: {
-    backgroundColor: COLORS.grey,
-    borderRadius: 10,
-    padding: 10,
     alignItems: 'center',
+    justifyContent: 'center',
     shadowOffset: {
       width: 0,
       height: 2,
@@ -64,6 +57,12 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.25,
     shadowRadius: 4,
     elevation: 5,
+    width: '100%',  
+  },
+  middleView: {
+    backgroundColor: COLORS.grey,
+    padding: 10,
+    borderRadius: 10,
   },
   button: {
     borderRadius: 20,
@@ -73,8 +72,7 @@ const styles = StyleSheet.create({
   modalText: {
     fontSize: 17, 
     color: COLORS.white, 
-    fontWeight: 600
+    fontWeight: '600'
   },
 });
-
 

@@ -55,8 +55,6 @@ const Dummy2 = ({ route, item }) => {
 
   const [isPressed, setIsPressed] = useState(false);
   const [isPressedIn, setIsPressedIn] = useState(false);
-  const [wordSpace, setWordSpace] = useState(false);
-  const [letterSpace, setLetterSpace] = useState(false);
   const [bgColor, setBgColor] = useState(COLORS.yellow);
 
   const [pressed, setPressed] = useState(false);
@@ -271,13 +269,9 @@ const Dummy2 = ({ route, item }) => {
             </View>
             <View>
           <ImageSlider
-            setWordSpace={setWordSpace}
-            setLetterSpace={setLetterSpace}
             bgColor={bgColor}
             letterPhrase={letterPhrase}
             letterPhraseIndex={letterPhraseIndex}
-            wordSpace={wordSpace}
-            letterSpace={letterSpace}
             visible={visible}
             pauseTimer={pauseTimer}
             codeSequence={codeSequence}

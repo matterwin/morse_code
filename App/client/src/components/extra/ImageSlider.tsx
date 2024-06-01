@@ -15,13 +15,9 @@ import { COLORS } from '../../constants';
 const { height, width } = Dimensions.get('window');
 
 const ImageSlider = ({
-  setWordSpace,
-  setLetterSpace,
   bgColor,
   letterPhrase,
   letterPhraseIndex,
-  wordSpace,
-  letterSpace,
   visible,
   pauseTimer,
   codeSequence,
@@ -83,13 +79,9 @@ const ImageSlider = ({
             <HelloWorld codeSequence={codeSequence} letterPhrase={letterPhrase} bgColor={bgColor} /> 
               :       
             <TopView
-              setWordSpace={setWordSpace}
-              setLetterSpace={setLetterSpace}
               bgColor={bgColor}
               letterPhrase={letterPhrase}
               letterPhraseIndex={letterPhraseIndex}
-              wordSpace={wordSpace}
-              letterSpace={letterSpace}
               visible={visible}
               pauseTimer={pauseTimer}
               codeSequence={codeSequence}

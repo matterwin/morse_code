@@ -10,13 +10,9 @@ import { morseCodeMap, generateMorseCode } from '../components/dots/MorseCodeMap
 const { width, height } = Dimensions.get('window');
 
 const TopView = ({
-  setWordSpace,
-  setLetterSpace,
   bgColor,
   letterPhrase,
   letterPhraseIndex,
-  wordSpace,
-  letterSpace,
   visible,
   pauseTimer,
   codeSequence,
@@ -55,7 +51,6 @@ const TopView = ({
   useEffect(() => {
     if (codeSequenceIndex < codeSequence.length) {
       if (codeSequence[codeSequenceIndex] === '/') {
-        setWordSpace(true);
         setTimer(wordPause);
         indexChangeTimer = setTimeout(() => {
           setTimer(0);
@@ -64,7 +59,6 @@ const TopView = ({
           setWordIndex(prev => prev+1); 
         }, wordPause);
       } else if(codeSequence[codeSequenceIndex] === ' ') {
-        setLetterSpace(true);
         setTimer(interCharPause);
         indexChangeTimer = setTimeout(() => {
           setTimer(0);
@@ -72,9 +66,10 @@ const TopView = ({
           setLetterPhraseIndex(prev => prev+1);
         }, interCharPause);
       } else {
-        setLetterSpace(false);
-        setWordSpace(false);
-        if (codeSequenceIndex-1 >= 0 && (codeSequence[codeSequenceIndex-1] !== '/' && codeSequence[codeSequenceIndex-1] !== ' ')) {
+        if (codeSequenceIndex-1 >= 0 
+            && (codeSequence[codeSequenceIndex-1] !== '/' 
+            && codeSequence[codeSequenceIndex-1] !== ' ')
+          ) {
           setTimer(timeunit);
         } else {
           console.log("new letter");
@@ -93,22 +88,8 @@ const TopView = ({
 
   return (
     <View style={[styles.topView, { backgroundColor: bgColor, paddingBottom: visible ? 0 : 0 }]}>
-        {wordSpace && !letterSpace && false &&
-          <>
-            <Text style={styles.phraseText}>word pause</Text>
-          </>
-        }
-        {!wordSpace && letterSpace && false &&
-          <>
-            <Text style={styles.phraseText}>symbol pause</Text>
-          </>
-        }
-        {!wordSpace && !letterSpace &&
-          <>
-          {visible && <Text style={styles.codeText}>{letterMorse(letterPhrase[letterPhraseIndex])}</Text>}
-            <Text style={[styles.phraseText, { fontSize: fontSize }]}>{letterPhrase[letterPhraseIndex]}</Text>
-          </>
-        }
+        {visible && <Text style={styles.codeText}>{letterMorse(letterPhrase[letterPhraseIndex])}</Text>}
+        <Text style={[styles.phraseText, { fontSize: fontSize }]}>{letterPhrase[letterPhraseIndex]}</Text>
         {(pauseTimer === 0) && 
           <View style={{ opacity: visible ? 1 : 0 }}>
           {codeSequence[codeSequenceIndex] === '.' ? 
