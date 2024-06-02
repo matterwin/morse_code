@@ -39,13 +39,10 @@ const SettingsBottomSheet = ({
   bottomSheetRef,
   setModalVisible,
   timeunit,
-  setTimeunit
+  setTimeunit,
 }: Props & { snapIndex: number }) => {
-  const [tmpWpm, setTmpWpm] = useState(wpm);
-  const [tmpTimeunit, setTmpTimeunit] = useState(timeunit);
-
   const calcWpm = (value) => {
-    setTmpWpm(value);
+    setWpm(value);
   };
 
   const snapPoints = useMemo(() => ['60%'], []);
@@ -72,17 +69,11 @@ const SettingsBottomSheet = ({
 	);
 
   useEffect(() => {
-    const timePerUnit = (60 / (tmpWpm * 50)) * 1000;
+    const timePerUnit = (60 / (wpm * 50)) * 1000;
     const tu = Math.round(timePerUnit);
-    setTmpTimeunit(tu);
-  }, [tmpWpm]);
-
-   const handleUpdate = () => {
-    setTimeunit(tmpTimeunit);
-    setWpm(tmpWpm);
-    bottomSheetRef.current.close();
-  };
-
+    setTimeunit(tu);
+  }, [wpm]);
+ 
   return (
     <View style={styles.container}>
       {children} 
@@ -103,7 +94,7 @@ const SettingsBottomSheet = ({
             <View style={{ margin: 10, marginLeft: 10 }}>
               <Text style={styles.titleText}>Settings</Text>
             </View>
-            <TouchableOpacity style={{ margin: 10, marginRight: 10 }} onPress={handleUpdate}>
+            <TouchableOpacity style={{ margin: 10, marginRight: 10 }} onPress={() => bottomSheetRef.current.close()}>
               <IconAwesome name="close" size={33} color={"#ccc"}/>
             </TouchableOpacity>
           </View>
@@ -113,7 +104,7 @@ const SettingsBottomSheet = ({
                 <Text style={{ fontSize: 17, color: COLORS.white, fontWeight: 600 }}>Reset</Text>
               </Pressable>
               <Pressable style={[styles.button, { backgroundColor: COLORS.greyLighter }]}>
-                <Text style={{ fontSize: 17, color: COLORS.white, fontWeight: 600 }}>WMP: {tmpWpm}</Text>
+                <Text style={{ fontSize: 17, color: COLORS.white, fontWeight: 600 }}>WMP: {wpm}</Text>
               </Pressable>
             </View>
             <View style={styles.middleView}>
@@ -129,11 +120,33 @@ const SettingsBottomSheet = ({
                   value={wpm}
                 />
               </View>
-              <View style={{ backgroundColor: COLORS.greyLighter, padding: 10, borderRadius: 10, width: '100%'}}>
-                <Text style={[styles.regText, { marginBottom: 10 }]}>1 time unit is ~{tmpTimeunit} ms</Text>
-                <Text style={styles.regText}>Intra-character Pause: {tmpTimeunit} ms </Text>
-                <Text style={styles.regText}>Inter-character Pause: {tmpTimeunit * 3} ms </Text>
-                <Text style={styles.regText}>Word Pause: {tmpTimeunit * 7} ms </Text>
+              <View style={{ backgroundColor: COLORS.greyLighter, padding: 10, borderRadius: 10, width: '100%' }}>
+                <View style={styles.infoView}>
+                  <Text style={[styles.regText, { marginBottom: 10 }]}>1 time unit </Text>
+                  <Text style={[styles.regText, { marginBottom: 10 }]}>~{timeunit} ms</Text>
+                </View>
+                <View style={styles.infoView}>
+                  <Text style={styles.regText}>Intra-character pause</Text>
+                  <Text style={[styles.regText]}>{timeunit} ms</Text>
+                </View>
+                <View style={styles.infoView}>
+                  <Text style={styles.regText}>Inter-character pause</Text>
+                  <Text style={[styles.regText]}>{timeunit*3} ms</Text>
+                </View>
+                <View style={styles.infoView}>
+                  <Text style={styles.regText}>Word pause</Text>
+                  <Text style={[styles.regText]}>{timeunit*7} ms</Text>
+                </View>
+              </View>
+              <View style={{ marginTop: 20, backgroundColor: COLORS.greyLighter, padding: 10, borderRadius: 10, width: '100%' }}>
+                <View style={styles.infoView}>
+                  <Text style={[styles.regText]}>dot    •</Text>
+                  <Text style={[styles.regText]}>{timeunit} ms</Text>
+                </View>
+                <View style={styles.infoView}>
+                  <Text style={styles.regText}>dash  —</Text>
+                  <Text style={[styles.regText]}>{timeunit*3} ms</Text>
+                </View>
               </View>
             </View>
           </BottomSheetScrollView>
@@ -256,6 +269,11 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     width: '100%'
   },
+  infoView: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center'
+  }
 });
 
 

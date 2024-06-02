@@ -55,7 +55,11 @@ const TopView = ({
         indexChangeTimer = setTimeout(() => {
           setTimer(0);
           setCodeSequenceIndex(prev => prev+1);
-          setLetterPhraseIndex(prev => prev+2);
+          if (codeSequence[codeSequenceIndex+1] === '/') {
+            setLetterPhraseIndex(prev => prev+1);
+          } else {
+            setLetterPhraseIndex(prev => prev+2);
+          }
           setWordIndex(prev => prev+1); 
         }, wordPause);
       } else if(codeSequence[codeSequenceIndex] === ' ') {
@@ -88,8 +92,8 @@ const TopView = ({
 
   return (
     <View style={[styles.topView, { backgroundColor: bgColor, paddingBottom: visible ? 0 : 0 }]}>
-        {visible && <Text style={styles.codeText}>{letterMorse(letterPhrase[letterPhraseIndex])}</Text>}
-        <Text style={[styles.phraseText, { fontSize: fontSize }]}>{letterPhrase[letterPhraseIndex]}</Text>
+        {visible && (pauseTimer === 0) && <Text style={styles.codeText}>{letterMorse(letterPhrase[letterPhraseIndex])}</Text>}
+        {(pauseTimer === 0) && <Text style={[styles.phraseText, { fontSize: fontSize }]}>{letterPhrase[letterPhraseIndex]}</Text>}
         {(pauseTimer === 0) && 
           <View style={{ opacity: visible ? 1 : 0 }}>
           {codeSequence[codeSequenceIndex] === '.' ? 

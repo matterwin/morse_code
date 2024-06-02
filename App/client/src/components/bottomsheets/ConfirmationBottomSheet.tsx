@@ -28,7 +28,15 @@ type Props = {
   children: JSX.Element | JSX.Element[];
 }
 
-const ConfirmationBottomSheet = ({ children, snapIndex, setSnapIndex, setSnapIndexForSettings, bottomSheetRefForSettings }: Props & { snapIndex: number }) => {
+const ConfirmationBottomSheet = ({ 
+  children, 
+  snapIndex, 
+  setSnapIndex, 
+  setSnapIndexForSettings, 
+  bottomSheetRefForSettings, 
+  setWpm,
+  setTimeunit, 
+}: Props & { snapIndex: number }) => {
   const bottomSheetRef = useRef<BottomSheet>(null);
 
   const calcWpm = (value) => {
@@ -51,7 +59,8 @@ const ConfirmationBottomSheet = ({ children, snapIndex, setSnapIndex, setSnapInd
 
   const confirmReset = () => {
     bottomSheetRef.current.close();
-    bottomSheetRefForSettings.current.close();
+    setWpm(12);
+    setTimeunit(100);
   };
 
   const cancelReset = () => {

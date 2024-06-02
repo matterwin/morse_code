@@ -208,15 +208,19 @@ const Dummy2 = ({ route, item }) => {
     });
   };
 
-  // useEffect(() => {
-  //   // console.log(morseCodeMap[letterPhrase[letterPhraseIndex]]);
-  //   console.log(codeSequence);
-  // },[codeSequence]);
+  useEffect(() => {
+    // console.log(morseCodeMap[letterPhrase[letterPhraseIndex]]);
+    console.log(codeSequence);
+    console.log(letterPhrase)
+    word.forEach((c, index) => {
+      console.log(`Index: ${index}, Value: ${c}`);
+    });
+  },[codeSequence]);
   
   const bottomSheetRefForSettings = useRef<BottomSheet>(null);
 
   const openSettingsBottomSheet = () => {
-    setModalVisible(true);
+    // setModalVisible(true);
     setSnapIndexForSettings(0);
   };
 
@@ -227,6 +231,7 @@ const Dummy2 = ({ route, item }) => {
       setSnapIndexForSettings={setSnapIndexForSettings}
       bottomSheetRefForSettings={bottomSheetRefForSettings}
       setTimeunit={setTimeunit}
+      setWpm={setWpm}
     >
       <SettingsBottomSheet 
         snapIndex={snapIndexForSettings}
@@ -244,14 +249,14 @@ const Dummy2 = ({ route, item }) => {
         <StatusBar style="dark" translucent={true}/>
         <View style={styles.topView}>
           <View style={{ zIndex: 1, width: '100%'}}>
-            {pauseTimer <= 0 && 1 && 
+            {pauseTimer <= 0 && 
               <Pressable onPress={openSettingsBottomSheet} style={styles.toppy}>
                 <View style={styles.topRightText}>
                   <Text style={styles.timerText}>{pressTimer} ms</Text>
                 </View>
               </Pressable>
             }
-            {pauseTimer > 0 && 1 && 
+            {pauseTimer > 0 && 
               <Pressable onPress={openSettingsBottomSheet} style={styles.toppy}>
                 <View style={styles.topRightText}>
                   <Text style={styles.timerText}>{pauseTimer} ms</Text>
@@ -259,7 +264,7 @@ const Dummy2 = ({ route, item }) => {
                 <Text>pause</Text>
               </Pressable>
             }
-            {pauseTimer <= 0 && 1 && 
+            {pauseTimer <= 0 && 
               <View style={styles.topLeftView}>
                 <View style={styles.topRightText}>
                   <Text style={styles.timerText}>{word[wordIndex]}</Text>
@@ -366,7 +371,7 @@ const Dummy2 = ({ route, item }) => {
             </View>
           </Pressable>
           <View style={{ display: (modalVisible) ? 'visible' : 'none' }}>
-              <AlertModal modalVisible={modalVisible} setModalVisible={setModalVisible} wpm={wpm}/>
+            <AlertModal modalVisible={modalVisible} setModalVisible={setModalVisible} wpm={wpm}/>
           </View>
         </SafeAreaView>
       </SettingsBottomSheet>
@@ -418,9 +423,9 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: COLORS.lightGrey,
-    height: '50%',
+    height: '40%',
     borderWidth: 4,
-    borderColor: 'transparent'
+    borderColor: 'transparent',
   },
   pressed: {
     borderColor: '#fff',
