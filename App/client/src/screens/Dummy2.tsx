@@ -366,7 +366,7 @@ const Dummy2 = ({ route, item }) => {
             </View>
           </Pressable>
           <View style={{ display: (modalVisible) ? 'visible' : 'none' }}>
-            <AlertModal modalVisible={modalVisible} setModalVisible={setModalVisible} wpm={wpm}/>
+              <AlertModal modalVisible={modalVisible} setModalVisible={setModalVisible} wpm={wpm}/>
           </View>
         </SafeAreaView>
       </SettingsBottomSheet>

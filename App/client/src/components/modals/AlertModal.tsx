@@ -1,7 +1,9 @@
 import React, { useEffect } from 'react';
-import { StyleSheet, Text, Pressable, View } from 'react-native';
+import { StyleSheet, Text, Pressable, View, Dimensions } from 'react-native';
 import Modal from 'react-native-modal';
 import { COLORS } from '../../constants';
+
+const { width, height } = Dimensions.get('window');
 
 const AlertModal = ({ modalVisible, setModalVisible, wpm, timeoutDuration = 3000}) => {
   useEffect(() => {
@@ -20,32 +22,37 @@ const AlertModal = ({ modalVisible, setModalVisible, wpm, timeoutDuration = 3000
   }, [modalVisible, timeoutDuration]);
 
   return (
-      <Modal
-        isVisible={modalVisible}
-        backdropOpacity={1}
-        animationIn="zoomIn"
-        animationOut="fadeOut"
-        backdropTransitionOutTiming={0}
-        useNativeDriver={true}
-        style={styles.modal}
-        hasBackdrop={true}
-      >
-        <View style={styles.modalView}>
-          <View style={styles.middleView}>
-          <Text style={styles.modalText}>Wpm {wpm}</Text>
-          </View>
+    <Modal
+      isVisible={modalVisible}
+      animationIn="fadeIn"
+      animationOut="fadeOut"
+      useNativeDriver={true}
+      hasBackdrop={false}
+      coverScreen={false}
+      style={styles.modal}
+      backdropOpacity={0}
+    >
+      <View style={styles.modalView}>
+        <View style={styles.middleView}>
+        <Text style={styles.modalText}>Wpm {wpm}</Text>
         </View>
-      </Modal>
+      </View>
+    </Modal>
   );
 };
 
 export default AlertModal;
 
 const styles = StyleSheet.create({
-   modal: {
-    justifyContent: 'flex-start',
+  container: {
+    flex: 1,
+    position: 'relative',
+  },
+  modal: {
+    justifyContent: 'center',
     margin: 0,
     top: '10%',
+    justifyContent: 'flex-start',
   },
   modalView: {
     alignItems: 'center',
