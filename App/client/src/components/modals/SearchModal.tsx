@@ -9,7 +9,7 @@ const SearchModal = ({ modalVisible, setModalVisible }) => {
       <Modal
         animationType="fade"
         transparent={true}
-        visible={modalVisible}
+        visible={true}
       >
         <BlurView intensity={40} style={{ flex: 1 }}>
           <View style={styles.centeredView}>

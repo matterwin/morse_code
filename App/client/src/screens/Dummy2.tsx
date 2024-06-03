@@ -206,6 +206,13 @@ const Dummy2 = ({ route, item }) => {
       duration: 300,
       easing: Easing.linear,
     });
+
+    setTimeout(() => {
+      rotation.value = withTiming(0, {
+        duration: 300,
+        easing: Easing.linear,
+      });
+    },300)
   };
 
   useEffect(() => {

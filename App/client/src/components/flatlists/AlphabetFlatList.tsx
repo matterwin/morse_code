@@ -2,27 +2,62 @@ import React from "react";
 import { TouchableOpacity, SafeAreaView, Button, Text, View, StyleSheet, Image, Pressable, FlatList, TextInput } from "react-native";
 import { COLORS } from '../../constants';
 import { letterMorse } from '../../components/dots/MorseCodeMap.tsx';
+import Animated, {
+  Easing,
+  useSharedValue,
+  useAnimatedStyle,
+  useDerivedValue,
+  withSpring,
+  withRepeat,
+  withSequence,
+  withTiming
+} from 'react-native-reanimated';
 
-const numColumns = 2;
+const numColumns = 3;
 const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789?:!.,:;:+-/=".split('');
 
-const ItemComponent = ({ item, handlePress, isFirst, isSecond, isSecondLast, isLast, isLastAgain, isActuallyLast}) => {
+const ItemComponent = ({ item, handlePress, isFirst, isSecond, isThird, isSecondLast, isLast, isLastAgain, isActuallyLast}) => {
+  const backgroundColor = useSharedValue(COLORS.yellow);
+
+  const animatedStyle = useAnimatedStyle(() => {
+    return {
+      backgroundColor: backgroundColor.value,
+    };
+  });
+
+  const startFadeOut = () => {
+    backgroundColor.value = withTiming('rgba(0, 0, 0, 0)', {
+      duration: 200,
+      easing: Easing.circle,
+    });
+  };
+
+  const endFadeOut = () => {
+    backgroundColor.value = withTiming(COLORS.yellow, {
+      duration: 200,
+      easing: Easing.linear,
+    });
+  };
+
   return (
-    <Pressable 
-      onPress={() => handlePress(item)} 
-      style={[
-        styles.item, 
-        isFirst && styles.firstItem, 
-        isSecond && styles.firstItem, 
-        isSecondLast && styles.lastItem, 
-        isLast && styles.lastItem,
-        isLastAgain && styles.lastItem,
-        isActuallyLast && styles.lastItem && { marginBottom: 400 }
-      ]}
+    <Animated.View style={[styles.item, animatedStyle, isFirst && styles.firstItem, 
+      isSecond && styles.firstItem, 
+      isThird && styles.firstItem,
+      isSecondLast && styles.lastItem, 
+      isLast && styles.lastItem,
+      isLastAgain && styles.lastItem,
+      isActuallyLast && styles.lastItem && { marginBottom: 300 }]}
     >
-      <Text style={styles.morseCodeText}>{letterMorse(item)}</Text>
-      <Text style={styles.text}>{item}</Text>
-    </Pressable>
+      <Pressable 
+        onPress={() => handlePress(item)}
+        onPressIn={() => startFadeOut()}
+        onPressOut={() => endFadeOut()}
+        style={styles.itemPressable}
+      >
+        <Text style={styles.morseCodeText}>{letterMorse(item)}</Text>
+        <Text style={styles.text}>{item}</Text>
+      </Pressable>
+    </Animated.View>
   );
 };
 
@@ -32,6 +67,7 @@ const AlphabetFlatList = ({ handlePress }) => {
         item={item} 
         isFirst={index === 0}
         isSecond={index === 1}
+        isThird={index === 2}
         isSecondLast={index === 24} 
         isLast={index === 25}
         isLastAgain={index === 35}
@@ -77,7 +113,10 @@ const styles = StyleSheet.create({
     marginTop: 30,
   },
   lastItem: {
-   marginBottom: 120,
+   marginBottom: 80,
+  },
+  box: {
+    width: '30%'
   },
   item: {
     backgroundColor: '#8a8a8a',
@@ -86,26 +125,33 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     height: 150,
-    width: '40%',
+    width: '31%',
     padding: 10,
     borderWidth: 0.2,
-    marginBottom: 0.2,
+    marginBottom: 10,
+    borderRadius: 10,
     // borderRadius: 10,
   },
   text: {
-    fontSize: 28,
+    fontSize: 32,
     fontWeight: "bold",
     color: COLORS.grey
   },
   listTextHeader: {
     fontSize: 24,
     fontWeight: "bold",
-    color: COLORS.lightGrey,
-    marginLeft: 20,
+    color: COLORS.yellow,
+    marginLeft: 10,
   },
   morseCodeText: {
-    fontSize: 14,
-    fontWeight: "bold",
+    fontSize: 24,
+    fontWeight: 700,
     color: COLORS.grey, 
+  },
+  itemPressable: {
+    height: '100%',
+    width: '100%',
+    justifyContent: 'center',
+    alignItems: 'center'
   },
 });
