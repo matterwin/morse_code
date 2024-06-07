@@ -2,7 +2,7 @@ import React from 'react';
 import { View, Text, StyleSheet, ScrollView } from 'react-native';
 import { COLORS } from '../constants/index.tsx';
 
-const HelloWorld = ({ codeSequence, letterPhrase, bgColor }) => {
+const TopViewSecond = ({ codeSequence, letterPhrase, bgColor }) => {
   return (
      <ScrollView contentContainerStyle={[styles.scrollViewContent, { backgroundColor: bgColor }]}>
       <View style={styles.container}>
@@ -39,5 +39,5 @@ const styles = StyleSheet.create({
   },
 });
 
-export default HelloWorld;
+export default TopViewSecond;
 

@@ -60,8 +60,6 @@ const MorseCode = ({
         setWordSpace(false);
         if (codeSequenceIndex-1 >= 0 && (codeSequence[codeSequenceIndex-1] !== '/' && codeSequence[codeSequenceIndex-1] !== ' ')) {
           setTimer(100);
-        } else {
-          console.log("new letter");
         }
       }
     } else {

@@ -24,6 +24,7 @@ import { COLORS } from '../../constants/index.tsx';
 import Icon from 'react-native-vector-icons/Ionicons';
 import IconAwesome from 'react-native-vector-icons/FontAwesome';
 import Slider from '@react-native-community/slider';
+import IconAwesome5 from 'react-native-vector-icons/FontAwesome5';
 
 type Props = {
   children: JSX.Element | JSX.Element[];
@@ -40,6 +41,10 @@ const SettingsBottomSheet = ({
   setModalVisible,
   timeunit,
   setTimeunit,
+  interCharPause,
+  setInterCharPause,
+  wordPause,
+  setWordPause
 }: Props & { snapIndex: number }) => {
   const calcWpm = (value) => {
     setWpm(value);
@@ -73,6 +78,11 @@ const SettingsBottomSheet = ({
     const tu = Math.round(timePerUnit);
     setTimeunit(tu);
   }, [wpm]);
+
+  useEffect(() => {
+    setInterCharPause(timeunit*3);
+    setWordPause(timeunit*7);
+  },[timeunit])
  
   return (
     <View style={styles.container}>
@@ -111,8 +121,8 @@ const SettingsBottomSheet = ({
               <View style={styles.sliderView}>
                 <Slider
                   style={{ height: 40, width: '100%', marginLeft: 10, marginRight: 10 }}
-                  minimumValue={5}
-                  maximumValue={35}
+                  minimumValue={1}
+                  maximumValue={20}
                   minimumTrackTintColor={COLORS.yellow}
                   maximumTrackTintColor={COLORS.lightGrey}
                   onValueChange={(value) => calcWpm(value)}
@@ -131,11 +141,11 @@ const SettingsBottomSheet = ({
                 </View>
                 <View style={styles.infoView}>
                   <Text style={styles.regText}>Inter-character pause</Text>
-                  <Text style={[styles.regText]}>{timeunit*3} ms</Text>
+                  <Text style={[styles.regText]}>{interCharPause} ms</Text>
                 </View>
                 <View style={styles.infoView}>
                   <Text style={styles.regText}>Word pause</Text>
-                  <Text style={[styles.regText]}>{timeunit*7} ms</Text>
+                  <Text style={[styles.regText]}>{wordPause} ms</Text>
                 </View>
               </View>
               <View style={{ marginTop: 20, backgroundColor: COLORS.greyLighter, padding: 10, borderRadius: 10, width: '100%' }}>
@@ -145,9 +155,22 @@ const SettingsBottomSheet = ({
                 </View>
                 <View style={styles.infoView}>
                   <Text style={styles.regText}>dash  —</Text>
-                  <Text style={[styles.regText]}>{timeunit*3} ms</Text>
+                  <Text style={[styles.regText]}>{interCharPause} ms</Text>
                 </View>
               </View>
+              <View style={{ marginTop: 10, marginBottom: 10, justifyContent: 'alignItems', alignItems: 'center', width: '100%', borderTopWidth: 1, borderColor: COLORS.greyLighter }}/>
+              <View style={{ flexDirection: 'row', gap: 10, marginBottom: 10, justifyContent: 'alignItems', alignItems: 'center', width: '100%', }}>
+                <IconAwesome
+                  name={'info'} 
+                  size={28} 
+                  color={'#ccc'} 
+                />
+                <Text style={[styles.regText, { fontWeight: 800, fontSize: 20 }]}>Instructions</Text>
+              </View>
+              <Text style={[styles.regText, { marginBottom: 8 }]}>The key is to follow the shown symbol and fill it.</Text>
+              <Text style={[styles.regText, { marginBottom: 8 }]}>Immediately after filling, stop upon it being filled and wait for the pause timer to end.</Text>
+              <Text style={[styles.regText, { marginBottom: 8 }]}>Next, immediately begin to fill in the next letter in order to properly time your morse code.</Text>
+            <Text style={styles.regText}>Repeat.</Text>
             </View>
           </BottomSheetScrollView>
         </View>
@@ -259,6 +282,7 @@ const styles = StyleSheet.create({
     alignItems: 'flex-start',
     justifyContent: 'center',
     paddingHorizontal: 10,
+    paddingBottom: 200,
   },
   regText: {
     color: COLORS.white,

@@ -6,5 +6,8 @@ export default {
   red: '#ff3700',
   green: '#007828',
   yellow: '#ffd35c',
-  neonGreen: '#49eb34'
+  neonGreen: '#49eb34',
+  blue: '#007aff',
+  snow: '#fffafa',
+  ice: '#f0f8ff'
 };

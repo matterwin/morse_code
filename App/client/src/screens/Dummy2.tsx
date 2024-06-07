@@ -11,7 +11,6 @@ import {
   Keyboard, 
   Pressable, 
   Dimensions,
-  Alert
 } from "react-native";
 import Animated, {
   Easing,
@@ -55,14 +54,11 @@ const Dummy2 = ({ route, item }) => {
 
   const [isPressed, setIsPressed] = useState(false);
   const [isPressedIn, setIsPressedIn] = useState(false);
-  const [bgColor, setBgColor] = useState(COLORS.yellow);
+  const [bgColor, setBgColor] = useState(COLORS.blue);
 
   const [pressed, setPressed] = useState(false);
-  const [padding, setPadding] = useState(10);
 
   const [sound, setSound] = useState();
-
-  const [pressInWhileNextSymbol, setPressInWhileNextSymbol] = useState(false);
 
   const [timer, setTimer] = useState(0);
 
@@ -79,6 +75,8 @@ const Dummy2 = ({ route, item }) => {
 
   const [wpm, setWpm] = useState(12);
   const [timeunit, setTimeunit] = useState(100);
+  const [interCharPause, setInterCharPause] = useState(300);
+  const [wordPause, setWordPause] = useState(700);
 
   const soundRef = useRef(null);
 
@@ -141,14 +139,12 @@ const Dummy2 = ({ route, item }) => {
   };
 
   const resetStates = () => {
-    console.log(selectedItem);
     setLetterPhrase(selectedItem);
     splitter();
     setWordIndex(0);
     setLetterPhraseIndex(0);
     setCodeSequenceIndex(0);
-    setBgColor(COLORS.yellow);
-    setPadding(10);
+    setBgColor(COLORS.blue);
     setTimer(0);
     setPressTimer(0);
     setPauseTimer(0);
@@ -206,28 +202,11 @@ const Dummy2 = ({ route, item }) => {
       duration: 300,
       easing: Easing.linear,
     });
-
-    setTimeout(() => {
-      rotation.value = withTiming(0, {
-        duration: 300,
-        easing: Easing.linear,
-      });
-    },300)
   };
-
-  useEffect(() => {
-    // console.log(morseCodeMap[letterPhrase[letterPhraseIndex]]);
-    console.log(codeSequence);
-    console.log(letterPhrase)
-    word.forEach((c, index) => {
-      console.log(`Index: ${index}, Value: ${c}`);
-    });
-  },[codeSequence]);
   
   const bottomSheetRefForSettings = useRef<BottomSheet>(null);
 
   const openSettingsBottomSheet = () => {
-    // setModalVisible(true);
     setSnapIndexForSettings(0);
   };
 
@@ -238,6 +217,8 @@ const Dummy2 = ({ route, item }) => {
       setSnapIndexForSettings={setSnapIndexForSettings}
       bottomSheetRefForSettings={bottomSheetRefForSettings}
       setTimeunit={setTimeunit}
+      setInterCharPause={setInterCharPause}
+      setWordPause={setWordPause}
       setWpm={setWpm}
     >
       <SettingsBottomSheet 
@@ -251,68 +232,68 @@ const Dummy2 = ({ route, item }) => {
         setModalVisible={setModalVisible}
         timeunit={timeunit}
         setTimeunit={setTimeunit}
+        interCharPause={interCharPause}
+        setInterCharPause={setInterCharPause}
+        wordPause={wordPause}
+        setWordPause={setWordPause}
       >
         <SafeAreaView style={styles.container}>
-        <StatusBar style="dark" translucent={true}/>
-        <View style={styles.topView}>
-          <View style={{ zIndex: 1, width: '100%'}}>
-            {pauseTimer <= 0 && 
-              <Pressable onPress={openSettingsBottomSheet} style={styles.toppy}>
-                <View style={styles.topRightText}>
-                  <Text style={styles.timerText}>{pressTimer} ms</Text>
+          <StatusBar style="light" translucent={true}/>
+          <View style={styles.topView}>
+            <View style={{ zIndex: 1, width: '100%'}}>
+              {pauseTimer <= 0 && 
+                <Pressable onPress={openSettingsBottomSheet} style={styles.toppy}>
+                  <View style={styles.topRightText}>
+                    <Text style={styles.timerText}>{pressTimer} ms</Text>
+                  </View>
+                </Pressable>
+              }
+              {pauseTimer > 0 && 
+                <Pressable onPress={openSettingsBottomSheet} style={styles.toppy}>
+                  <View style={styles.topRightText}>
+                    <Text style={styles.timerText}>{pauseTimer} ms</Text>
+                  </View>
+                  <Text>pause</Text>
+                </Pressable>
+              }
+              {pauseTimer <= 0 && 
+                <View style={styles.topLeftView}>
+                  <View style={styles.topRightText}>
+                    <Text style={styles.timerText}>{word[wordIndex]}</Text>
+                  </View>
                 </View>
-              </Pressable>
-            }
-            {pauseTimer > 0 && 
-              <Pressable onPress={openSettingsBottomSheet} style={styles.toppy}>
-                <View style={styles.topRightText}>
-                  <Text style={styles.timerText}>{pauseTimer} ms</Text>
-                </View>
-                <Text>pause</Text>
-              </Pressable>
-            }
-            {pauseTimer <= 0 && 
-              <View style={styles.topLeftView}>
-                <View style={styles.topRightText}>
-                  <Text style={styles.timerText}>{word[wordIndex]}</Text>
-                </View>
+              }
               </View>
-            }
-            </View>
             <View>
-          <ImageSlider
-            bgColor={bgColor}
-            letterPhrase={letterPhrase}
-            letterPhraseIndex={letterPhraseIndex}
-            visible={visible}
-            pauseTimer={pauseTimer}
-            codeSequence={codeSequence}
-            codeSequenceIndex={codeSequenceIndex}
-            setCodeSequence={setCodeSequence}
-            setCodeSequenceIndex={setCodeSequenceIndex}
-            setLetterPhraseIndex={setLetterPhraseIndex}
-            word={word}
-            wordIndex={wordIndex}
-            pressed={pressed}
-            padding={padding}
-            setPadding={setPadding}
-            pressInWhileNextSymbol={pressInWhileNextSymbol}
-            setPressInWhileNextSymbol={setPressInWhileNextSymbol}
-            timer={timer}
-            setTimer={setTimer}
-            setBgColor={setBgColor}
-            pressTimer={pressTimer}
-            setPressTimer={setPressTimer}
-            indexChangeTimer={indexChangeTimer}
-            soundRef={soundRef}
-            volume={volume}
-            setWordIndex={setWordIndex}
-            modalVisible={modalVisible}
-            setModalVisible={setModalVisible}
-            wpm={wpm}
-            timeunit={timeunit}
-          />
-          </View>
+              <ImageSlider
+                bgColor={bgColor}
+                letterPhrase={letterPhrase}
+                letterPhraseIndex={letterPhraseIndex}
+                visible={visible}
+                pauseTimer={pauseTimer}
+                codeSequence={codeSequence}
+                codeSequenceIndex={codeSequenceIndex}
+                setCodeSequence={setCodeSequence}
+                setCodeSequenceIndex={setCodeSequenceIndex}
+                setLetterPhraseIndex={setLetterPhraseIndex}
+                word={word}
+                wordIndex={wordIndex}
+                pressed={pressed}
+                timer={timer}
+                setTimer={setTimer}
+                setBgColor={setBgColor}
+                pressTimer={pressTimer}
+                setPressTimer={setPressTimer}
+                indexChangeTimer={indexChangeTimer}
+                soundRef={soundRef}
+                volume={volume}
+                setWordIndex={setWordIndex}
+                wpm={wpm}
+                timeunit={timeunit}
+                interCharPause={interCharPause}
+                wordPause={wordPause}
+              />
+            </View>
           </View>
           <View style={styles.middleView}>
             <View style={[styles.rowView, { marginLeft: 20, }]}>

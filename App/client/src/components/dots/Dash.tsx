@@ -1,5 +1,6 @@
-import React, { useState, useEffect, useRef } from "react";
-import { Pressable, View, StyleSheet, Text } from "react-native";
+import React, { useState, useEffect, useRef } from 'react';
+import { View, Button, Text, StyleSheet } from 'react-native';
+import ProgressBar from 'react-native-progress/Bar';
 import { COLORS } from '../../constants';
 import Animated, {
   Easing,
@@ -12,7 +13,7 @@ import Animated, {
   withTiming
 } from 'react-native-reanimated';
 
-const Dash = ({ 
+const Dash = ({
   pressed, 
   padding, 
   setPadding,
@@ -23,24 +24,17 @@ const Dash = ({
   pressTimer, 
   setPressTimer,
   timeunit,
+  interCharPause
 }) => {
-  const shake = useSharedValue(0);
-  const innerViewRef = useRef(null);
-  const dashViewRef = useRef(null);
-  const [innerWidth, setInnerWidth] = useState(0);
-  const [dashWidth, setDashWidth] = useState(0);
   const [error, setError] = useState(false);
-  const [passed, setPassed] = useState(false);
-  const [tmpBgColor, setTmpBgColor] = useState(bgColor);
-
+  const [progress, setProgress] = useState(0);  
   const [next, setNext] = useState(true);
-
-  const dashTu = timeunit * 3;
+  const shake = useSharedValue(0);
 
   let timer;
   let pressTimerInterval;
   useEffect(() => {
-    if (!pressed && (pressTimer === dashTu || pressTimer === timeunit)) {
+    if (!pressed && (pressTimer === interCharPause || pressTimer === timeunit)) {
       setPressTimer(0);
     }
 
@@ -50,48 +44,38 @@ const Dash = ({
       const updateElapsedTime = () => { 
         const elapsedTime = Date.now() - startTime;
         setPressTimer(elapsedTime);
-        setPadding((elapsedTime / dashTu) * 100);  
+        setProgress((elapsedTime / interCharPause));  
       }; 
 
       pressTimerInterval = setInterval(updateElapsedTime, 1);
 
       timer = setTimeout(() => {
-        clearInterval(pressTimerInterval);
+        clearInterval(pressTimerInterval)
+        setProgress(0);
         setNext(true);
-        setPadding(10);
-        setPressTimer(dashTu);
+        setPressTimer(interCharPause);
         setCodeSequenceIndex(prevCodeSequenceIndex => prevCodeSequenceIndex + 1);
-      }, dashTu);
+      }, interCharPause);
     } else {
       setNext(false);
-      if (!pressed && pressTimer < dashTu && pressTimer !== 0 && pressTimer !== timeunit && pressTimer !== dashTu) {
+      if (!pressed && pressTimer < interCharPause && pressTimer !== 0 && pressTimer !== timeunit && pressTimer !== interCharPause)  {
         startShake();
         setPressTimer(0);
         setError(true);
         setBgColor(COLORS.red);
         setTimeout(() => {
           setError(false);
-          setBgColor(tmpBgColor);
+          setBgColor(COLORS.blue);
         }, 300);
       }
-      setPadding(10);
+      setProgress(0);
     }
 
     return () => {
       clearTimeout(timer);
       clearInterval(pressTimerInterval);
     };
-  }, [pressed]);
-
-  const onInnerLayout = (event) => {
-    const { width } = event.nativeEvent.layout;
-    setInnerWidth(width);
-  };
-
-  const onDashLayout = (event) => {
-    const { width } = event.nativeEvent.layout;
-    setDashWidth(width);
-  };
+  }, [pressed]); 
 
   const shakeStyle = useAnimatedStyle(() => {
     return {
@@ -115,38 +99,37 @@ const Dash = ({
   };
 
   return (
-    <Animated.View
-      ref={dashViewRef}
-      style={[
-        styles.dashView,
-        shakeStyle,
-        { borderColor: error ? '#ff3700' : passed ? COLORS.neonGreen : 'transparent' }
-      ]}
-      onLayout={onDashLayout}
-      onTouchStart={() => startShake()}
-    >
-      <View style={{ paddingVertical: 15, backgroundColor: COLORS.green }}>
-        <View
-          ref={innerViewRef}
-          style={{ paddingRight: `${padding}%` }}
-          onLayout={onInnerLayout}
+      <Animated.View
+        style={[
+          styles.dashView,
+          shakeStyle,
+        ]}
+      >
+        <ProgressBar
+          progress={progress} 
+          width={100} 
+          height={25} 
+          unfilledColor={COLORS.grey} 
+          color={COLORS.snow}
+          borderWidth={3}
+          borderColor={"#000"}
+          animated={false}
         />
-      </View>
-    </Animated.View>
+      </Animated.View>
   );
 };
-
-export default Dash;
 
 const styles = StyleSheet.create({
   dashView: {
     paddingVertical: 0,
-    width: 75,
-    backgroundColor: COLORS.grey,
+    width: 100,
     alignItems: 'flex-start',
     justifyContent: 'flex-start',
     overflow: 'hidden',
     borderColor: 'transparent',
   },
 });
+
+export default Dash;
+
 

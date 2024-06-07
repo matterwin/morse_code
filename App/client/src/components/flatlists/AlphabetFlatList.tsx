@@ -17,7 +17,7 @@ const numColumns = 3;
 const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789?:!.,:;:+-/=".split('');
 
 const ItemComponent = ({ item, handlePress, isFirst, isSecond, isThird, isSecondLast, isLast, isLastAgain, isActuallyLast}) => {
-  const backgroundColor = useSharedValue(COLORS.yellow);
+  const backgroundColor = useSharedValue(COLORS.blue);
 
   const animatedStyle = useAnimatedStyle(() => {
     return {
@@ -33,7 +33,7 @@ const ItemComponent = ({ item, handlePress, isFirst, isSecond, isThird, isSecond
   };
 
   const endFadeOut = () => {
-    backgroundColor.value = withTiming(COLORS.yellow, {
+    backgroundColor.value = withTiming(COLORS.blue, {
       duration: 200,
       easing: Easing.linear,
     });
@@ -120,8 +120,7 @@ const styles = StyleSheet.create({
   },
   item: {
     backgroundColor: '#8a8a8a',
-    // backgroundColor: COLORS.grey,
-    backgroundColor: COLORS.yellow,
+    backgroundColor: COLORS.blue,
     alignItems: "center",
     justifyContent: "center",
     height: 150,
@@ -130,23 +129,23 @@ const styles = StyleSheet.create({
     borderWidth: 0.2,
     marginBottom: 10,
     borderRadius: 10,
-    // borderRadius: 10,
   },
   text: {
     fontSize: 32,
     fontWeight: "bold",
-    color: COLORS.grey
+    color: COLORS.ice
   },
   listTextHeader: {
     fontSize: 24,
     fontWeight: "bold",
-    color: COLORS.yellow,
+    color: COLORS.blue,
     marginLeft: 10,
   },
   morseCodeText: {
     fontSize: 24,
     fontWeight: 700,
-    color: COLORS.grey, 
+    color: '#000',
+    color: COLORS.yellow
   },
   itemPressable: {
     height: '100%',

@@ -23,10 +23,6 @@ const TopView = ({
   word,
   wordIndex,
   pressed,
-  padding,
-  setPadding,
-  pressInWhileNextSymbol,
-  setPressInWhileNextSymbol,
   timer,
   setTimer,
   setBgColor,
@@ -36,21 +32,20 @@ const TopView = ({
   soundRef,
   volume,
   setWordIndex,
-  modalVisible,
-  setModalVisible,
-  timeunit
+  timeunit,
+  interCharPause,
+  wordPause
 }) => {
   const fontSize = width * 0.15;
-  const interCharPause = timeunit * 3;
-  const wordPause = timeunit * 7;
 
   useEffect(() => {
     generateMorseCode(letterPhrase, setCodeSequence);
   }, [letterPhrase]);
 
   useEffect(() => {
-    if (codeSequenceIndex < codeSequence.length) {
-      if (codeSequence[codeSequenceIndex] === '/') {
+    if (codeSequenceIndex >= 0 && codeSequenceIndex < codeSequence.length) {
+      let sym = codeSequence[codeSequenceIndex];
+      if (sym === '/') {
         setTimer(wordPause);
         indexChangeTimer = setTimeout(() => {
           setTimer(0);
@@ -62,21 +57,19 @@ const TopView = ({
           }
           setWordIndex(prev => prev+1); 
         }, wordPause);
-      } else if(codeSequence[codeSequenceIndex] === ' ') {
+      } else if(sym === ' ') {
         setTimer(interCharPause);
         indexChangeTimer = setTimeout(() => {
           setTimer(0);
           setCodeSequenceIndex(prev => prev+1);
           setLetterPhraseIndex(prev => prev+1);
         }, interCharPause);
-      } else {
-        if (codeSequenceIndex-1 >= 0 
+      } else if (sym === '.' || sym === '-'){
+        if (codeSequenceIndex >= 1 
             && (codeSequence[codeSequenceIndex-1] !== '/' 
             && codeSequence[codeSequenceIndex-1] !== ' ')
           ) {
           setTimer(timeunit);
-        } else {
-          console.log("new letter");
         }
       }
     } else {
@@ -92,41 +85,41 @@ const TopView = ({
 
   return (
     <View style={[styles.topView, { backgroundColor: bgColor, paddingBottom: visible ? 0 : 0 }]}>
-        {visible && (pauseTimer === 0) && <Text style={styles.codeText}>{letterMorse(letterPhrase[letterPhraseIndex])}</Text>}
-        {(pauseTimer === 0) && <Text style={[styles.phraseText, { fontSize: fontSize }]}>{letterPhrase[letterPhraseIndex]}</Text>}
-        {(pauseTimer === 0) && 
-          <View style={{ opacity: visible ? 1 : 0 }}>
-          {codeSequence[codeSequenceIndex] === '.' ? 
+      {visible && (pauseTimer === 0) && 
+        <Text style={[styles.codeText, { marginTop: visible ? -40 : 0 }]}>{letterMorse(letterPhrase[letterPhraseIndex])}</Text>
+      }
+      {(pauseTimer === 0) && 
+        <Text style={[styles.phraseText, { fontSize: fontSize }]}>{letterPhrase[letterPhraseIndex]}</Text>
+      }
+      {(pauseTimer === 0) && 
+        <View style={{ opacity: visible ? 1 : 0 }}>
+          {codeSequence[codeSequenceIndex] === '.' && (
             <Dot 
               pressed={pressed} 
-              padding={padding} 
-              setPadding={setPadding}
               setCodeSequenceIndex={setCodeSequenceIndex}
-              pressInWhileNextSymbol={pressInWhileNextSymbol}
               bgColor={bgColor}
               setBgColor={setBgColor}
               pressTimer={pressTimer}
               setPressTimer={setPressTimer}
               timeunit={timeunit}
-            /> : 
-            codeSequence[codeSequenceIndex] === '-' ? 
+              interCharPause={interCharPause}
+            />
+          )}
+          {codeSequence[codeSequenceIndex] === '-' && (
             <Dash 
               pressed={pressed} 
-              padding={padding} 
-              setPadding={setPadding}
               setCodeSequenceIndex={setCodeSequenceIndex}
-              pressInWhileNextSymbol={pressInWhileNextSymbol}
               bgColor={bgColor}
               setBgColor={setBgColor}
               pressTimer={pressTimer}
               setPressTimer={setPressTimer}
               timeunit={timeunit}
-            /> : 
-            <></>
-          }
-          </View>
-        }
-      </View>
+              interCharPause={interCharPause}
+            />
+          )} 
+        </View>
+      }
+    </View>
   );
 };
 

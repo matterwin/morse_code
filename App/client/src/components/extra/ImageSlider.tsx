@@ -8,7 +8,7 @@ import {
   Pressable
 } from 'react-native';
 import Dummy2 from '../../screens/Dummy2.tsx';
-import HelloWorld from '../../screens/TopViewSecond.tsx';
+import TopViewSecond from '../../screens/TopViewSecond.tsx';
 import TopView from '../../screens/TopView.tsx';
 import { COLORS } from '../../constants';
 
@@ -43,7 +43,9 @@ const ImageSlider = ({
   setWordIndex,
   modalVisible,
   setModalVisible,
-  timeunit
+  timeunit,
+  interCharPause,
+  wordPause
 }) => {
   const [active, setActive] = useState(0);
 
@@ -76,7 +78,7 @@ const ImageSlider = ({
           style={[{ width }]}
         >
           {view.selectedItem === 'HelloWorld' ? 
-            <HelloWorld codeSequence={codeSequence} letterPhrase={letterPhrase} bgColor={bgColor} /> 
+            <TopViewSecond codeSequence={codeSequence} letterPhrase={letterPhrase} bgColor={bgColor} /> 
               :       
             <TopView
               bgColor={bgColor}
@@ -92,10 +94,6 @@ const ImageSlider = ({
               word={word}
               wordIndex={wordIndex}
               pressed={pressed}
-              padding={padding}
-              setPadding={setPadding}
-              pressInWhileNextSymbol={pressInWhileNextSymbol}
-              setPressInWhileNextSymbol={setPressInWhileNextSymbol}
               timer={timer}
               setTimer={setTimer}
               setBgColor={setBgColor}
@@ -105,9 +103,9 @@ const ImageSlider = ({
               soundRef={soundRef}
               volume={volume}
               setWordIndex={setWordIndex}
-              modalVisible={modalVisible}
-              setModalVisible={setModalVisible}
               timeunit={timeunit}
+              interCharPause={interCharPause}
+              wordPause={wordPause}
             />
           }
         </View>

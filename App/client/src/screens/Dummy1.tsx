@@ -28,7 +28,6 @@ import AlphabetFlatList from '../components/flatlists/AlphabetFlatList.tsx';
 import NumbersFlatList from '../components/flatlists/NumbersFlatList.tsx';
 import { checkCharacters } from '../components/dots/MorseCodeMap.tsx';
 import ImageSlider from '../components/extra/ImageSlider.tsx';
-import SearchModal from '../components/modals/SearchModal.tsx';
 
 const Dummy1 = () => {
   const [userInput, setUserInput] = useState('');
@@ -51,43 +50,43 @@ const Dummy1 = () => {
       <BlurView intensity={0} style={styles.overlay}>
         <LinearGradient 
           colors={['rgba(0,0,0,0.75)', 'rgba(0,0,0,0.45)', 'rgba(0,0,0,0.15)', 'transparent']}
-          style={{ flex:1, width: '100%' }}
+          style={{ flex: 1, width: '100%' }}
         />
-        <BlurView intensity={30} style={styles.blurContainer}>
-        <View style={{ alignItems: 'center', justifyContent: 'center', width: '90%', borderRadius: 20, backgroundColor: 'rgba(43, 43, 43, 0.7)' }} >
-        <View style={{  flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', width: '100%', borderRadius: 20, }}>
-        <View style={styles.textInputContainer}>
-          <View style={styles.textInputContainerOld}>
-            <TouchableOpacity>
-              <Icon 
-                name={'search'} 
-                size={25} 
-                color={'#ccc'} 
-                style={styles.searchIconOld} 
-              />
-            </TouchableOpacity>
-            <TextInput
-              placeholder='Enter phrase'
-              placeholderTextColor={'#fff'}
-              autoCapitalize='none'
-              autoCorrect={false}
-              onChangeText={(text) => setUserInput(text)}
-              style={styles.textInput}
-              keyboardAppearance='dark'
-              value={userInput}
-              returnKeyType="search"
-              onSubmitEditing={handleSearch}
-            />
-            {userInput !== '' &&
-              <TouchableOpacity onPress={() => setUserInput('')}>
-                <Icon name="close" size={25} color={'#ccc'} style={styles.closeIcon} />
-              </TouchableOpacity>
-            }
-          </View>
-        </View> 
-        </View>
-      </View>      
-                                                                        </BlurView>
+        <BlurView intensity={20} style={styles.blurContainer}>
+          <View style={styles.outerContainer}>
+            <View style={styles.innerContainer}>
+              <View style={styles.textInputContainerOuter}>
+                <View style={styles.textInputContainerInner}>
+                  <Pressable onPress={handleSearch}>
+                    <Icon 
+                      name={'search'} 
+                      size={25} 
+                      color={'#ccc'} 
+                      style={styles.searchIcon} 
+                    />
+                  </Pressable>
+                  <TextInput
+                    placeholder='Enter a phrase'
+                    placeholderTextColor={'#ccc'}
+                    autoCapitalize='none'
+                    autoCorrect={false}
+                    onChangeText={(text) => setUserInput(text)}
+                    style={styles.textInput}
+                    keyboardAppearance='dark'
+                    value={userInput}
+                    returnKeyType="search"
+                    onSubmitEditing={handleSearch}
+                  />
+                  {userInput !== '' &&
+                    <TouchableOpacity onPress={() => setUserInput('')}>
+                      <Icon name="close" size={25} color={'#ccc'} style={styles.closeIcon} />
+                    </TouchableOpacity>
+                  }
+                </View>
+              </View> 
+            </View>
+          </View>      
+        </BlurView>
       </BlurView>
       <AlphabetFlatList handlePress={handlePress} />
     </View>
@@ -97,12 +96,12 @@ const Dummy1 = () => {
 export default Dummy1;
 
 const styles = StyleSheet.create({
-   container: {
+  container: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
     width: '100%',
-    backgroundColor: COLORS.greyLighter
+    backgroundColor: COLORS.grey
   },
   overlay: {
     position: "absolute",
@@ -115,7 +114,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center'
   },
-  textInputContainer: {
+  textInputContainerOuter: {
     alignItems: 'center',
     borderRadius: 15,
     width: "100%",
@@ -126,7 +125,7 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
     borderRadius: 20,
   },
-  textInputContainerOld: {
+  textInputContainerInner: {
     flexDirection: 'row',
     alignItems: 'center',
     width: '100%',
@@ -140,13 +139,23 @@ const styles = StyleSheet.create({
   },
   searchIcon: {
     marginLeft: 15,
-    marginRight: 15,
-  },
-  searchIconOld: {
-    paddingLeft: 15
   },
   closeIcon: {
     paddingRight: 15,
+  },
+  outerContainer: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    width: '90%',
+    borderRadius: 20,
+    backgroundColor: 'rgba(43, 43, 43, 0.8)',
+  },
+  innerContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    width: '100%',
+    borderRadius: 20,
   },
 });
 

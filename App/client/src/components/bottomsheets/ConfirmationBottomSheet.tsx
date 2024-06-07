@@ -35,13 +35,11 @@ const ConfirmationBottomSheet = ({
   setSnapIndexForSettings, 
   bottomSheetRefForSettings, 
   setWpm,
-  setTimeunit, 
+  setTimeunit,
+  setInterCharPause,
+  setWordPause
 }: Props & { snapIndex: number }) => {
   const bottomSheetRef = useRef<BottomSheet>(null);
-
-  const calcWpm = (value) => {
-    setWpm(value);
-  };
 
   const snapPoints = useMemo(() => ['25%'], []);
 
@@ -61,6 +59,8 @@ const ConfirmationBottomSheet = ({
     bottomSheetRef.current.close();
     setWpm(12);
     setTimeunit(100);
+    setInterCharPause(300);
+    setWordPause(700);
   };
 
   const cancelReset = () => {
